@@ -30,7 +30,8 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 - [ ] If necessary, Maybe retrieve and use session cookies from the browser?
 - [x] Fix specified HTML element discovery issues
 - [x] Chromium not woking properly with Linux
-- [ ] Headless browser experience (run the bot without launching the browser)
+- [x] Headless browser experience (Only the login and home page is shown. No link visitin.)
+- [ ] You can change this in the `config.py` file. Where it says `headless = True`
 - [ ] More robustness of the bot for different fields
 - [ ] Output not completed fields in Linkedin
 - [ ] Add support to other major job seeking websites (Glassdoor, AngelCo, Greenhouse, Monster, GLobalLogic, djinni)
