@@ -15,8 +15,8 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions, Options
 
 
 class LinkedIn:
-    def __init__(self):
-        self.driver = ""
+    def __init__(self) -> object:
+        self.driver = webdriver.Chrome()
         self.login()
 
     def login(self) -> None:
@@ -31,33 +31,34 @@ class LinkedIn:
         browser = webdriver.Chrome(options=options)
 
         try:
-            # Log in to LinkedIn using the email and password specified in config.py.
+            # Fill out the email and password from the config file.
             browser.get('https://www.linkedin.com/login')
             browser.find_element("id", "username").send_keys(config.email)
             browser.find_element("id", "password").send_keys(config.password)
-            time.sleep(5)  # Wait 5 seconds for the page to load completely before logging in.
-
-            browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
-            print('Checking if logged in...')
             time.sleep(5)
 
-            # Check if the log in was successfull
+            # Log in
+            browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
+
+            # Check if the login was successful
             if browser.current_url == 'https://www.linkedin.com/feed/':
-
-                # ! Code hangs here.
-                # Need to make it continue through all the methods
                 print('�� Logged in successfully!')
-                # stay logged in until user closes the browser
+                # stay logged in until user closes the browser, and continue to run the bot
                 while True:
-                    time.sleep(60)  # Wait 60 seconds before checking again
+                    try:
+                        self.generate_urls()
+                        self.link_job_apply()
+                    except Exception as e:
+                        print("An error occurred: ", str(e))
+                    finally:
+                        time.sleep(60)
             else:
-                print("❌ You were either not auto logged in, or the session ended prematurely.\n"
-                      " check your credentials in config.py.")
-        except Exception as e:
-            print(e)
+                print("❌ oops, check config.py.")
+        except:
+            pass
 
-    @staticmethod
-    def generate_urls() -> None:
+    # Generate LinkedIn job URLs based on the specified criteria in the config file.
+    def generate_urls(self):
         if not os.path.exists('data'):
             os.makedirs('data')
         try:
@@ -68,15 +69,29 @@ class LinkedIn:
             print("Urls are created successfully, now the bot will visit those urls.")
         except:
             print(
-                "Couldnt generate url, make sure you have /data folder and modified config.py file for your "
-                "preferances.")
+                "Couldnt generate url, make sure you have /data folder and modified config.py file for your ""prefrences.")
+        finally:
+            pass
 
+    # Apply to all the jobs generated in the urlData.txt file.
     def link_job_apply(self) -> None:
         self.generate_urls()
         count_applied = 0
         count_jobs = 0
 
+        #self.driver.get('https://www.linkedin.com/jobs/')
+        #time.sleep(random.uniform(1, constants.botSpeed))
+
+        ## Extract job data from each job page and write to results file
+        #while True:
+        #    try:
+        #        self.driver.find_element(By.XPATH, '//button[@aria-label="Load more results"]').click()
+        #        time.sleep(random.uniform(1, constants.botSpeed))
+        #    except:
+        #        break
+
         url_data = utils.get_url_data_file()
+
         for url in url_data:
             self.driver.get(url)
             try:
@@ -272,10 +287,10 @@ while True:
         LinkedIn().link_job_apply()
     except Exception as e:
         print("Error in main: " + str(e))
-        # close firefox driver
         end = time.time()
         print("---Took: " + str(round((time.time() - start) / 60)) + " minute(s).")
-        LinkedIn().driver.quit()
+        #LinkedIn().driver.quit()
+
 
 
 
