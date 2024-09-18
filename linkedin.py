@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 
-
 import math
 import os
 import random
 from typing import Union
 from selenium.webdriver.remote.webelement import WebElement
-import config
 import constants
-from utils import pr_red, pr_yellow, pr_green
-import time
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 import utils
+import time
+from selenium import webdriver
+import config
+from selenium.webdriver.chrome.options import Options as ChromeOptions, Options
 
 
 class LinkedIn:
@@ -20,28 +19,42 @@ class LinkedIn:
         self.driver = ""
         self.login()
 
-
     def login(self) -> None:
+        options = Options()
+
+        options.add_argument("--start-half-window")
+        options.add_argument("--ignore-certificate-errors")
+        options.add_argument('--no-sandbox')
+        options.add_argument("--disable-blink-features")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("-profile")
+        browser = webdriver.Chrome(options=options)
+
         try:
             # Log in to LinkedIn using the email and password specified in config.py.
-            self.driver = webdriver.Chrome()
-            self.driver.get("https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin")
-            #self.driver.get("https://www.linkedin.com/login")
-            self.driver.find_element("id", "username").send_keys(config.email)
-            self.driver.find_element("id", "password").send_keys(config.password)
+            browser.get('https://www.linkedin.com/login')
+            browser.find_element("id", "username").send_keys(config.email)
+            browser.find_element("id", "password").send_keys(config.password)
+            time.sleep(5)  # Wait 5 seconds for the page to load completely before logging in.
+
+            browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
+            print('Checking if logged in...')
             time.sleep(5)
-            # self.driver.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
-            sign_in_button = self.driver.find_element(By.CSS_SELECTOR, "button.btn__primary--large")
-            sign_in_button.click()
-           # self.driver.find_element("xpath", '//*[div=class]/login_form/button/"Sign in"').click()
-            pr_yellow("Attempting to log into linkedin...")
+
+            # Check if the log in was successfull
+            if browser.current_url == 'https://www.linkedin.com/feed/':
+
+                # ! Code hangs here.
+                # Need to make it continue through all the methods
+                print('�� Logged in successfully!')
+                # stay logged in until user closes the browser
+                while True:
+                    time.sleep(60)  # Wait 60 seconds before checking again
+            else:
+                print("❌ You were either not auto logged in, or the session ended prematurely.\n"
+                      " check your credentials in config.py.")
         except Exception as e:
-            pr_red(e)
-            # if user is already logged in, then skip the login process. and begin the link_job_apply() method.
-            if "Feed" in self.driver.title:
-                pr_green('✅ You are successfully logged in to Linkedin, you can now run main bot script!')
-                self.link_job_apply()
-                return
+            print(e)
 
     @staticmethod
     def generate_urls() -> None:
@@ -52,9 +65,9 @@ class LinkedIn:
                 linkedin_job_links = utils.LinkedinUrlGenerate().generate_url_links()
                 for url in linkedin_job_links:
                     file.write(url + "\n")
-            pr_green("Urls are created successfully, now the bot will visit those urls.")
+            print("Urls are created successfully, now the bot will visit those urls.")
         except:
-            pr_red(
+            print(
                 "Couldnt generate url, make sure you have /data folder and modified config.py file for your "
                 "preferances.")
 
@@ -149,8 +162,8 @@ class LinkedIn:
                         line_to_write = job_properties + " | " + "* 🥳 Already applied! Job: " + str(offer_page)
                         self.display_write_results(line_to_write)
 
-            pr_yellow("Category: " + url_words[0] + "," + url_words[1] + " applied: " + str(count_applied) +
-                      " jobs out of " + str(count_jobs) + ".")
+            print("Category: " + url_words[0] + "," + url_words[1] + " applied: " + str(count_applied) +
+                  " jobs out of " + str(count_jobs) + ".")
 
         # utils.donate(self)
 
@@ -167,41 +180,41 @@ class LinkedIn:
             job_title = self.driver.find_element(By.XPATH, "//h1[contains(@class, 'job-title')]").get_attribute(
                 "innerHTML").strip()
         except Exception as e:
-            pr_yellow("Warning in getting job_title: " + str(e)[0:50])
+            print("Warning in getting job_title: " + str(e)[0:50])
             job_title = ""
         try:
             job_company = self.driver.find_element(By.XPATH,
                                                    "//a[contains(@class, 'ember-view t-black t-normal')]").get_attribute(
                 "innerHTML").strip()
         except Exception as e:
-            pr_yellow("Warning in getting job_company: " + str(e)[0:50])
+            print("Warning in getting job_company: " + str(e)[0:50])
             job_company = ""
         try:
             job_location = self.driver.find_element(By.XPATH, "//span[contains(@class, 'bullet')]").get_attribute(
                 "innerHTML").strip()
         except Exception as e:
-            pr_yellow("Warning in getting job_location: " + str(e)[0:50])
+            print("Warning in getting job_location: " + str(e)[0:50])
             job_location = ""
         try:
             job_work_place = self.driver.find_element(By.XPATH,
                                                       "//span[contains(@class, 'workplace-type')]").get_attribute(
                 "innerHTML").strip()
         except Exception as e:
-            pr_yellow("Warning in getting jobWorkPlace: " + str(e)[0:50])
+            print("Warning in getting jobWorkPlace: " + str(e)[0:50])
             job_work_place = ""
         try:
             job_posted_date = self.driver.find_element(By.XPATH,
                                                        "//span[contains(@class, 'posted-date')]").get_attribute(
                 "innerHTML").strip()
         except Exception as e:
-            pr_yellow("Warning in getting job_posted_date: " + str(e)[0:50])
+            print("Warning in getting job_posted_date: " + str(e)[0:50])
             job_posted_date = ""
         try:
             job_applications = self.driver.find_element(By.XPATH,
                                                         "//span[contains(@class, 'applicant-count')]").get_attribute(
                 "innerHTML").strip()
         except Exception as e:
-            pr_yellow("Warning in getting job_applications: " + str(e)[0:50])
+            print("Warning in getting job_applications: " + str(e)[0:50])
             job_applications = ""
 
         text_to_write = str(
@@ -250,7 +263,7 @@ class LinkedIn:
             print(line_to_write)
             utils.write_results(line_to_write)
         except Exception as e:
-            pr_red("Error in DisplayWriteResults: " + str(e))
+            print("Error in DisplayWriteResults: " + str(e))
 
 
 start = time.time()
@@ -258,10 +271,12 @@ while True:
     try:
         LinkedIn().link_job_apply()
     except Exception as e:
-        pr_red("Error in main: " + str(e))
+        print("Error in main: " + str(e))
         # close firefox driver
         end = time.time()
-        pr_yellow("---Took: " + str(round((time.time() - start) / 60)) + " minute(s).")
+        print("---Took: " + str(round((time.time() - start) / 60)) + " minute(s).")
         LinkedIn().driver.quit()
+
+
 
 
