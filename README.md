@@ -1,5 +1,6 @@
 # LinkedIn_Apply
 A Python bot that will apply to the "Easy Apply" jobs based on your preferences.
+I may be adding Streamlit and Ollama at somepoint. Therefore, they are in the requirements.txt
 
 <br>
 
