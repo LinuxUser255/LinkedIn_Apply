@@ -48,7 +48,12 @@ cd LinkedIn_Apply
 ```
 <br>
 
-- Create a virtual evniroment, then install the requirements
+- Create a virtual evniroment, source it, then install the requirements
+
+```shell
+python -m venv env
+source env/bin/activate
+```
 
 ```shell
 pip3 install -r requirements.txt
