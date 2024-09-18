@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 import time
 from selenium import webdriver
-
 import config
-from config import email, password
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options as ChromeOptions, Options
-from dotenv import load_dotenv
 
 
 print("This script will check if the bot can automatically log in Linkedin for you.")
@@ -57,38 +52,34 @@ def check_chrome():
 def check_selenium_linkedin():
     options = Options()
 
-    #options.add_argument("--start-maximized")
-    # do not maximize browser window
     options.add_argument("--start-half-window")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument('--no-sandbox')
     options.add_argument("--disable-blink-features")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("-profile")
-    # options.headless = True..should I use this?
     browser = webdriver.Chrome(options=options)
 
-    browser.get('https://www.linkedin.com/feed/?trk=guest_homepage-basic_nav-header-signin')
-    browser.find_element("id", "username").send_keys(config.email)
-    browser.find_element("id", "password").send_keys(config.password)
-    time.sleep(5)
-
-    browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
-    browser = browser.find_element(by="class name", value="btn__primary--large from__button--floating")
-    # selenium.common.exceptions.NoSuchElementException: Message: no such element: Unable to locate element:
-    # {"method":"css selector","selector":".btn__primary--large from__button--floating"}
-    # need to find this: <button class="btn__primary--large from__button--floating" data-litms-control-urn="login-submit" aria-label="Sign in" type="submit">
-    #               Sign in
-    #           </button>
-    browser.click()
-
     try:
-        browser.url('https://www.linkedin.com/')
-        time.sleep(3)
-        if "homepage" in browser.url:
-            print('✅ Successfully you are logged in to Linkedin, you can now run main bot script!')
+        # Log in to LinkedIn using the email and password specified in config.py.
+        browser.get('https://www.linkedin.com/login')
+        browser.find_element("id", "username").send_keys(config.email)
+        browser.find_element("id", "password").send_keys(config.password)
+        time.sleep(5)  # Wait 5 seconds for the page to load completely before logging in.
+
+        browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
+        print('Checking if logged in...')
+        time.sleep(5)
+
+       # Check if the log in was successfull
+        if browser.current_url == 'https://www.linkedin.com/feed/':
+            print('�� Logged in successfully!')
+            # stay logged in until user closes the browser
+            while True:
+                time.sleep(60)  # Wait 60 seconds before checking again
         else:
-            print('❌ You are not automatically logged in, check your credentials in config.py.')
+            print("❌ You were either not auto logged in, or the session ended prematurely.\n"
+                  " check your credentials in config.py.")
     except Exception as e:
         print(e)
 
@@ -103,4 +94,3 @@ def check():
 
 if __name__ == "__main__":
     check()
-
