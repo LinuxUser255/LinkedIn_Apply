@@ -1,2 +1,16 @@
 # LinkedIn_Apply
-Python bot to apply  Linkedin Easy Apply jobs based on your preferences.
+A Python bot that will apply to the "Easy Apply" jobs based on your preferences.
+
+<br>
+
+**You will need to download the Chrome Driver and palce it in the same directory as the python files/scripts**
+https://googlechromelabs.github.io/chrome-for-testing/#stable
+
+<br>
+
+**Clone the repository & Install the requirments**
+```shell
+git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
+
+pip3 install -r requirements.txt
+```
