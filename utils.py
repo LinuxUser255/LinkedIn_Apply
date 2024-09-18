@@ -1,89 +1,15 @@
 """
 Utilities
-
-:author: LinuxUser255
-:date: 2024-09-24
-:version: 2.0
-
-About
-============
-This file contains all the utility functions used in the main script.
-Some of the code had been refactored, and in keeping within the PEP 8 naming-conventions,
-all of the function names and variable names have been changed to lower case.
-
-And, all of the methods contained within the class: "LinkedinUrlGenerate:"
-have been converted to @staticmethod
 """
 import math, constants, config
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-#from selenium.webdriver.common.keys import Keys  # Import Keys
 from typing import List
 import time
-from bs4 import BeautifulSoup
-from selenium.webdriver import Chrome
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from dotenv import load_dotenv
-import os
+from test import check_selenium_linkedin
 
 
-def browser_options() -> Options:
-    options = Options()
-
-    options.add_argument("--start-maximized")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument('--no-sandbox')
-    options.add_argument("--disable-blink-features")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    # options.add_argument("-profile")
-    # options.add_argument(firefox_profile_root_dir)
-
-    # Replace webdriver.Firefox with webdriver.Chrome
-    browser = webdriver.Chrome(options=options)
-
-
-    # Goal is to use just one browser window, and either open a new tab with every iteration
-    # or if possible, use the current tab and just make new requests in that
-    try:
-        browser.get('https://www.linkedin.com/login')
-
-        # Open a new tab
-        browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
-
-        # Navigate to the new tab URL
-        browser.get('https://www.linkedin.com/jobs/?=')
-
-    finally:
-        browser.quit()
-
-    #return options
-
-
-def pr_red(prt: str) -> None:
-    print(f"\033[91m{prt}\033[00m")
-
-
-def pr_green(prt: str) -> None:
-    print(f"\033[92m{prt}\033[00m")
-
-
-def pr_yellow(prt: str) -> None:
-    print(f"\033[93m{prt}\033[00m")
-
-    # create a function to check if the user is logged in or not
-    # if user is logged in, then skip the login process and apply to the jobs
-    # if user is not logged in, then log in and apply to the jobs
-def get_loggedin_status() -> bool:
-    try:
-        # Need to change all Firefox to Chrome
-        browser = webdriver.Firefox(options=browser_options())
-        browser.get('https://www.linkedin.com/login')
-        browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 't')
-        browser.get('https://www.linkedin.com/jobs/?=')
-        browser.quit()
-        return True
-    except:
-        return False
+# taking care of the logged in status via the check_selenium_linkedin function from test.py
+def get_loggedin_status():
+    check_selenium_linkedin()
 
 
 def get_url_data_file() -> List[str]:
@@ -94,9 +20,8 @@ def get_url_data_file() -> List[str]:
     except FileNotFoundError:
         text = ("FileNotFound:url_data.txt file is not found. Please run ./data folder exists and check config.py "
                 "values of yours. Then run the bot again")
-        pr_red(text)
+        print(text)
     return url_data
-
 
 def jobs_to_pages(num_of_jobs: str) -> int:
     number_of_pages = 1
@@ -112,7 +37,6 @@ def jobs_to_pages(num_of_jobs: str) -> int:
         number_of_pages = int(num_of_jobs)
 
     return number_of_pages
-
 
 def url_to_keywords(url: str) -> List[str]:
     keyword_url = url[url.index("keywords=") + 9:]
@@ -148,9 +72,8 @@ def write_results(text: str) -> None:
 
             f.write(text + "\n")
 
-
 def print_info_mes(bot: str) -> None:
-    pr_yellow("ℹ️ " + bot + " is starting soon... ")
+    print("ℹ️ " + bot + " is starting soon... ")
 
 
 def check_job_location(job: str) -> str:
@@ -169,7 +92,6 @@ def check_job_location(job: str) -> str:
         job_loc += "&geoId=103537801"
 
     return job_loc
-
 
 class LinkedinUrlGenerate:
     def generate_url_links(self) -> List[str]:
@@ -325,7 +247,7 @@ class LinkedinUrlGenerate:
             sort_by = "sort_by=R"
         return sort_by
 
-    def main(self):
+    def util_run(self):
         # Your main function code goes here
         # For example, you can call the LinkedinUrlGenerate class and its methods
         url_generator = LinkedinUrlGenerate()
@@ -334,5 +256,4 @@ class LinkedinUrlGenerate:
             print(url)
 
     if __name__ == "__main__":
-        main()
-
+        util_run()
