@@ -6,8 +6,10 @@
 
 - This repo/codebase is a work in progress, & is intended to be an updated version of [my other linkedin bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
+<br>
 
-- You will need to download the Chrome Driver and palce it in the same directory as the python files/scripts
+
+## You will need to download the [Chrome Driver](https://googlechromelabs.github.io/chrome-for-testing/#stable) and palce it in the directory alongside the python files
 https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 <br>
