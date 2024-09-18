@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 
-from linkedin import Linkedin
+from linkedin import (
+    LinkedIn,
+)
 
 def run_bot():
-    pass
-
+    bot = LinkedIn()
+    bot.login()
+    bot.generate_urls()
+    bot.link_job_apply()
 
 
 def main():
-    pass
+    run_bot()
 
 
 if __name__ == "__main__":
