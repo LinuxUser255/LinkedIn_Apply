@@ -1,9 +1,11 @@
+selenium
+webdriver_manager
 streamlit
 langchain
 langchain_ollama
-selenium
-webdriver_manager
 beautifulsoup4
 lxml
 html5lib
 python-dotenv
+ast
+json
