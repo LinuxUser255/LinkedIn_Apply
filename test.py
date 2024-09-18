@@ -65,11 +65,10 @@ def check_selenium_linkedin():
         browser.get('https://www.linkedin.com/login')
         browser.find_element("id", "username").send_keys(config.email)
         browser.find_element("id", "password").send_keys(config.password)
-        time.sleep(5)  # Wait 5 seconds for the page to load completely before logging in.
-
-        browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
-        print('Checking if logged in...')
         time.sleep(5)
+
+        # Logging in
+        browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
 
        # Check if the log in was successfull
         if browser.current_url == 'https://www.linkedin.com/feed/':
