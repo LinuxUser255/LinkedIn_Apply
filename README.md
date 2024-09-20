@@ -18,25 +18,41 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 **In order of most to least important**
 
-
+**Browser handling issues**
 - [x] Eliminate launching a new browser/login session with each iteration.
+- [x] Each URL is being visited in the same window
 - [x] Conduct all searches and applications within one browser session.
-- [ ] Add ability to add a custom URL, such as a search you did, and apply to every job in that result
-- [ ] If not easy apply, then Make bot able to follow external links
+
+<br>
+
+**Completing the Easy apply section**
+- [ ] Resolve the click on "Easy apply" button
+- [ ] Handle all following popups and boxes after clicking Easy apply
+
+<br>
+
+  **After all of the Easy apply functionality is complete...** 
+- [ ] Make bot able to apply on external links
 - [ ] Make it able to register & logon to external job applications
-- [ ] Apply to the jobs on external sites 
+
+<br>
+
+  **Misc..**
 - [x] Follow PEP 8 Syle Guide coding conventions:
 - [x] Change all Variable and Function names to lower case
-- [x] Avoid account login issues:
+- [x] Avoid account login issues
+- [x] Headless browser experience (Only the login and home page is shown. No link visitin.)
+- [x] You can change this in the `config.py` file. Where it says `headless = True`
+
+<br>
+
+**Other**
+- [x] Fix specified HTML element discovery issues
+- [x] ~~Chromium not woking properly with Linux~~
+- [ ] More robustness of the bot for different fields
+- [ ] Add support to other major job seeking websites (Glassdoor, AngelCo, Greenhouse,
 - [ ] Possibly need? Evade Anti-Bot detection
 - [ ] If necessary, Maybe retrieve and use session cookies from the browser?
-- [x] Fix specified HTML element discovery issues
-- [x] Chromium not woking properly with Linux
-- [x] Headless browser experience (Only the login and home page is shown. No link visitin.)
-- [ ] You can change this in the `config.py` file. Where it says `headless = True`
-- [ ] More robustness of the bot for different fields
-- [ ] Output not completed fields in Linkedin
-- [ ] Add support to other major job seeking websites (Glassdoor, AngelCo, Greenhouse, Monster, GLobalLogic, djinni)
 
 <br>
 
@@ -65,3 +81,4 @@ pip3 install -r requirements.txt
 **- The bot can run either by executing `main.py` or `linkedin.py`. Both ways work.**
 
 <br>
+
