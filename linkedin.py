@@ -3,26 +3,66 @@
 import math
 import os
 import random
-from typing import Union
-from selenium.webdriver.remote.webelement import WebElement
-import constants
-from selenium.webdriver.common.by import By
-import utils
 import time
+
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+
 import config
-from selenium.webdriver.chrome.options import Options as ChromeOptions, Options
+import constants
+import utils
 
 
 class LinkedIn:
-    def __init__(self) -> object:
+    def __init__(self) -> None:
         self.driver = webdriver.Chrome()
         self.login()
 
     def login(self) -> None:
         options = Options()
 
-        options.add_argument("--start-half-window")
+        options.add_argument("--window-size=1024,768")
+        options.add_argument("--ignore-certificate-errors")
+        options.add_argument('--no-sandbox')
+        options.add_argument("--disable-blink-features")
+        options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_argument("-profile")
+        browser = webdriver.Chrome(options=options)
+        # Use the same driver instance for login and job application
+        self.driver = webdriver.Chrome(options=options)
+
+        try:
+            # Launches the browser window: the login page
+            # Fill out the email and password from the conf
+            self.driver.get('https://www.linkedin.com/login')
+            self.driver.find_element("id", "username").send_keys(config.email)
+            self.driver.find_element("id", "password").send_keys(config.password)
+            time.sleep(5)
+
+            # Looks for the login button and clicks it
+            self.driver.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
+
+            # Check if the login was successful
+            if self.driver.current_url == 'https://www.linkedin.com/feed/':
+                print('✅ Logged in successfully!')
+                # stay logged in until user closes the browser, and continue to run the bot
+                while True:
+                    try:
+                        self.generate_urls()
+                        # Apply to all the jobs generated in the urlData.txt file.
+                        self.link_job_apply()
+                    except Exception as e:
+                        print("An error occurred: ", str(e))
+                    finally:
+                        time.sleep(60)
+            else:
+                print("❌ oops, check config.py.")
+        except:
+            pass
+        options = Options()
+
+        options.add_argument("--window-size=800,600")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument('--no-sandbox')
         options.add_argument("--disable-blink-features")
@@ -31,13 +71,14 @@ class LinkedIn:
         browser = webdriver.Chrome(options=options)
 
         try:
-            # Fill out the email and password from the config file.
+            # Launches the browser window: the login page
+            # Fill out the email and password from the conf
             browser.get('https://www.linkedin.com/login')
             browser.find_element("id", "username").send_keys(config.email)
             browser.find_element("id", "password").send_keys(config.password)
             time.sleep(5)
 
-            # Log in
+            # Looks for the login button and clicks it
             browser.find_element("xpath", '//*[@id="organic-div"]/form/div[3]/button').click()
 
             # Check if the login was successful
@@ -47,6 +88,10 @@ class LinkedIn:
                 while True:
                     try:
                         self.generate_urls()
+                        # open the link_job_apply in the same browser window as the login window
+                        browser.execute_script("window.open('');")
+                        browser.switch_to.window(browser.window_handles[-1])
+                        # Apply to all the jobs generated in the urlData.txt file.
                         self.link_job_apply()
                     except Exception as e:
                         print("An error occurred: ", str(e))
@@ -79,17 +124,6 @@ class LinkedIn:
         count_applied = 0
         count_jobs = 0
 
-        #self.driver.get('https://www.linkedin.com/jobs/')
-        #time.sleep(random.uniform(1, constants.botSpeed))
-
-        ## Extract job data from each job page and write to results file
-        #while True:
-        #    try:
-        #        self.driver.find_element(By.XPATH, '//button[@aria-label="Load more results"]').click()
-        #        time.sleep(random.uniform(1, constants.botSpeed))
-        #    except:
-        #        break
-
         url_data = utils.get_url_data_file()
 
         for url in url_data:
@@ -110,7 +144,7 @@ class LinkedIn:
                 current_page_jobs = constants.jobsPerPage * page
                 url = url + "&start=" + str(current_page_jobs)
                 self.driver.get(url)
-                time.sleep(random.uniform(1, constants.botSpeed))
+                time.sleep(random.uniform(5, constants.botSpeed))
 
                 offers_per_page = self.driver.find_elements(By.XPATH, '//li[@data-occludable-job-id]')
 
@@ -120,23 +154,28 @@ class LinkedIn:
                     offer_ids.append(int(offer_id.split(":")[-1]))
 
                 for jobID in offer_ids:
-                    offer_page = 'https://www.linkedin.com/jobs/view/' + str(jobID)
+                    # Bot works better when setting offer page to /search, instead of /view/
+                    # offer_page = 'https://www.linkedin.com/jobs/view/' + str(jobID)
+                    offer_page = 'https://www.linkedin.com/jobs/search/' + str(jobID)
                     self.driver.get(offer_page)
-                    time.sleep(random.uniform(1, constants.botSpeed))
+                    time.sleep(random.uniform(5, constants.botSpeed))
 
                     count_jobs += 1
 
                     job_properties = self.get_job_properties(count_jobs)
 
                     button = self.easy_apply_button()
+                   # button = self.driver.find_element(By.XPATH, '//button[contains(@class, "easy_apply_button")]')
 
                     if button is not False:
-                        button.click()
-                        time.sleep(random.uniform(1, constants.botSpeed))
+                        self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Easy Apply']").click()
+                        time.sleep(random.uniform(5, constants.botSpeed))
+                        # button.click()
+                        time.sleep(random.uniform(5, constants.botSpeed))
                         count_applied += 1
                         try:
                             self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-                            time.sleep(random.uniform(1, constants.botSpeed))
+                            time.sleep(random.uniform(5, constants.botSpeed))
 
                             line_to_write = job_properties + " | " + "* 🥳 Just Applied to this job: " + str(offer_page)
                             self.display_write_results(line_to_write)
@@ -145,7 +184,7 @@ class LinkedIn:
                             try:
                                 self.driver.find_element(By.CSS_SELECTOR,
                                                          "button[aria-label='Continue to next step']").click()
-                                time.sleep(random.uniform(1, constants.botSpeed))
+                                time.sleep(random.uniform(5, constants.botSpeed))
                                 com_percentage = self.driver.find_element(By.XPATH,
                                                                           'html/body/div[3]/div/div/div[2]/div/div/span').text
                                 percen_number = int(com_percentage[0:com_percentage.index("%")])
@@ -154,33 +193,15 @@ class LinkedIn:
                                 self.display_write_results(line_to_write)
 
                             except Exception as e:
-                                try:
-                                    self.driver.find_element(By.CSS_SELECTOR,
-                                                             "option[value='urn:li:country:" + config.country_code + "']").click()
-                                    time.sleep(random.uniform(1, constants.botSpeed))
-                                    self.driver.find_element(By.CSS_SELECTOR, 'input').send_keys(config.phone_number)
-                                    time.sleep(random.uniform(1, constants.botSpeed))
-                                    self.driver.find_element(By.CSS_SELECTOR,
-                                                             "button[aria-label='Continue to next step']").click()
-                                    time.sleep(random.uniform(1, constants.botSpeed))
-                                    com_percentage = self.driver.find_element(By.XPATH,
-                                                                              'html/body/div[3]/div/div/div[2]/div/div/span').text
-                                    percen_number = int(com_percentage[0:com_percentage.index("%")])
-                                    result = self.apply_process(percen_number, offer_page)
-                                    line_to_write = job_properties + " | " + result
-                                    self.display_write_results(line_to_write)
-                                except Exception as e:
-                                    line_to_write = job_properties + " | " + "* 🥵 Cannot apply to this Job! " + str(
-                                        offer_page)
-                                    self.display_write_results(line_to_write)
+                                line_to_write = job_properties + " | " + "* 🥵 Cannot apply to this Job! " + str(
+                                    offer_page)
+                                self.display_write_results(line_to_write)
                     else:
                         line_to_write = job_properties + " | " + "* 🥳 Already applied! Job: " + str(offer_page)
                         self.display_write_results(line_to_write)
 
             print("Category: " + url_words[0] + "," + url_words[1] + " applied: " + str(count_applied) +
                   " jobs out of " + str(count_jobs) + ".")
-
-        # utils.donate(self)
 
     def get_job_properties(self, count: int) -> str:
         text_to_write = ""
@@ -236,14 +257,11 @@ class LinkedIn:
             count) + " | " + job_title + " | " + job_company + " | " + job_location + " | " + job_work_place + " | " + job_posted_date + " | " + job_applications
         return text_to_write
 
-    def easy_apply_button(self) -> Union[WebElement, bool]:
+    def easy_apply_button(self):
         try:
-            # Find the 'Easy Apply' button using the XPath selector.
-            button = self.driver.find_element(By.XPATH,
-                                              '//button[contains(@class, "jobs-apply-button")]')
+            button = self.driver.find_element(By.XPATH,'//button[contains(@class, "artdeco-button__text")]')
             easy_apply_button = button
         except:
-            # If the 'Easy Apply' button is not found, return False.
             easy_apply_button = False
 
         return easy_apply_button
@@ -254,17 +272,17 @@ class LinkedIn:
         try:
             for pages in range(apply_pages - 2):
                 self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Continue to next step']").click()
-                time.sleep(random.uniform(1, constants.botSpeed))
+                time.sleep(random.uniform(5, constants.botSpeed))
 
             self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Review your application']").click()
-            time.sleep(random.uniform(1, constants.botSpeed))
+            time.sleep(random.uniform(5, constants.botSpeed))
 
             if config.followCompanies is False:
                 self.driver.find_element(By.CSS_SELECTOR, "label[for='follow-company-checkbox']").click()
-                time.sleep(random.uniform(1, constants.botSpeed))
+                time.sleep(random.uniform(5, constants.botSpeed))
 
             self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
-            time.sleep(random.uniform(1, constants.botSpeed))
+            time.sleep(random.uniform(5, constants.botSpeed))
 
             result = "* 🥳 Just Applied to this job: " + str(offer_page)
         except:
@@ -289,9 +307,4 @@ while True:
         print("Error in main: " + str(e))
         end = time.time()
         print("---Took: " + str(round((time.time() - start) / 60)) + " minute(s).")
-        #LinkedIn().driver.quit()
-
-
-
-
-
+        LinkedIn().driver.quit()
