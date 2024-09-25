@@ -23,6 +23,7 @@ That can cause problems with logging into your account. And force you to complet
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
 import time
 import random
 import config
@@ -76,13 +77,13 @@ class LinkedInClick:
         except:
             pass
 
-    def click_ez_button(self):
+        # Here we try four different ways find the easy apply button, and then click it.
+
+    def xpath_find(self, driver):
         try:
-            button = self.driver.find_element(By.XPATH,
-                                              '//button[contains(@class, "artdeco-button__text") and.//span[contains(text(), "Easy Apply")]]')
-            if button is not None:
+            button = driver.find_element(By.XPATH, '//*[@id="ember58"]/svg')
+            if button:
                 button.click()
-                time.sleep(random.uniform(5, constants.botSpeed))
                 print("Easy Apply Button Clicked!")
             else:
                 print("Easy Apply Button Not Found!")
@@ -91,6 +92,57 @@ class LinkedInClick:
         finally:
             # If the button is not found, remain logged in until the user manually closes the browser.
             time.sleep(60)
+
+    def xpath_full(self, driver):
+        try:
+            button = driver.find_element(By.XPATH,
+                                         '/html/body/div[4]/div[3]/div[4]/div/div/main/div/div[2]/div[2]/div/div[2]/div/div[1]/div/div[1]/div/div[1]/div/div[6]/div/div/div/button/svg')
+            if button:
+                button.click()
+                print("Easy Apply Button Clicked!")
+            else:
+                print("Easy Apply Button Not Found!")
+        except Exception as e:
+            print("An error occurred while clicking the Easy Apply button: ", str(e))
+        finally:
+            # If the button is not found, remain logged in until the user manually closes the browser.
+            time.sleep(60)
+
+    def element_finder(self, driver):
+        try:
+            button = driver.find_element(By.CSS_SELECTOR,
+                                         'svg[role="none"][aria-hidden="true"][class="artdeco-button__icon artdeco-button__icon--in-bug"]')
+            if button:
+                button.click()
+                print("Easy Apply Button Clicked!")
+            else:
+                print("Easy Apply Button Not Found!")
+        except Exception as e:
+            print("An error occurred while clicking the Easy Apply button: ", str(e))
+        finally:
+            # If the button is not found, remain logged in until the user manually closes the browser.
+            time.sleep(60)
+
+    def bsoup_finder(self, driver):
+        try:
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            button = soup.find('button', {'class': 'artdeco-button', 'data-control-name': 'apply'})
+            if button:
+                button.click()
+                print("Easy Apply Button Clicked!")
+            else:
+                print("Easy Apply Button Not Found!")
+        except Exception as e:
+            print("An error occurred while clicking the Easy Apply button: ", str(e))
+        finally:
+            # If the button is not found, remain logged in until the user manually closes the browser.
+            time.sleep(60)
+
+    def click_ez_button(self):
+        self.xpath_find(self.driver)
+        self.xpath_full(self.driver)
+        self.element_finder(self.driver)
+        self.bsoup_finder(self.driver)
 
 
 start = time.time()
