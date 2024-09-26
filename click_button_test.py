@@ -4,6 +4,8 @@
 The purpose of this script is for troubleshooting the 
 click Easy Apply button.
 
+There are two other versions of this script in the Test_Scripts directory
+
 It is similar to the primary one, linkedin.py.
 However, this one is limitted to:
 
