@@ -29,6 +29,7 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 - [x] Resolve the click on "Easy apply" button: Works in `click_button_test.py`
 - [ ] Integrate the four mehods used to click the Easy Apply button into `linkedin.py`
 - [ ] Handle all following popups and boxes after clicking Easy apply
+- [ ] Tie it all together in `main.py`
 
 <br>
 
