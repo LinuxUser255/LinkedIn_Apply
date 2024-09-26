@@ -1,1 +1,1 @@
-# provide a quick apply job link here, when running the login_click.py script. And delete this instruction message.
+# provide a quick apply job link here, when running the click_button_test.py script. And delete this instruction message.
