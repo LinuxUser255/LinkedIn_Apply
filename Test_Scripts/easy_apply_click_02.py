@@ -10,7 +10,6 @@ instead of the original four try-except blocks. The script loops over each metho
 Xpath, Full Xpath, the Element, and finally Beautiful Soup
 until the button is founc and clicked.
 
-
 """
 
 
