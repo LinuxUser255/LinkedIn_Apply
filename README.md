@@ -79,19 +79,12 @@ cd LinkedIn_Apply
 ```
 <br>
 
-#### Activate the virtual enviroment
+#### Download & Activate the virtual enviroment
 ```shell
 curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
 ```
 
 <br>
-
-### Create a virtual evniroment, source it, then install the requirements
-
-```shell
-# Activate the virtual enviroment
-curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
-```
 
 ### the install pip3 requirements
 ```shell
