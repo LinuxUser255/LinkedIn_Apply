@@ -72,18 +72,25 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 **Clone the repository & Install the requirments**
 ```shell
+```shell
+git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
+
+cd LinkedIn_Apply
+```
+
 # Activate the virtual enviroment
 curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
 ```
 <br>
 
-- Create a virtual evniroment, source it, then install the requirements
+### Create a virtual evniroment, source it, then install the requirements
 
 ```shell
-python -m venv env
-source env/bin/activate
+# Activate the virtual enviroment
+curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
 ```
 
+### the install pip3 requirements
 ```shell
 pip3 install -r requirements.txt
 ```
