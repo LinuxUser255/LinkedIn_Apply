@@ -88,7 +88,7 @@ curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/head
 
 ### the install pip3 requirements
 ```shell
-pip3 install -r requirements.txt
+pip3 install -r requirements.yml
 ```
 <br>
 
