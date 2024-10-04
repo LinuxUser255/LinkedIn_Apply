@@ -72,9 +72,8 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 **Clone the repository & Install the requirments**
 ```shell
-git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
-
-cd LinkedIn_Apply
+# Activate the virtual enviroment
+curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
 ```
 <br>
 
