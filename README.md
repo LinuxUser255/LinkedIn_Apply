@@ -43,7 +43,7 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 <br>
 
-  **After all of the Easy apply functionality is complete...** 
+  **After all of the Easy apply functionality is complete.
 - [ ] Make bot able to apply on external links
 - [ ] Make it able to register & logon to external job applications
 
@@ -70,17 +70,20 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 ## Install & use
 
-**Clone the repository & Install the requirments**
+### Clone the repository & Install the requirments**
 ```shell
-```shell
+
 git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
 
 cd LinkedIn_Apply
 ```
+<br>
 
-# Activate the virtual enviroment
+#### Activate the virtual enviroment
+```shell
 curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
 ```
+
 <br>
 
 ### Create a virtual evniroment, source it, then install the requirements
@@ -96,7 +99,7 @@ pip3 install -r requirements.txt
 ```
 <br>
 
-**- The bot can run either by executing `main.py` or `linkedin.py`. Both ways work.**
+### The bot can run either by executing `main.py` or `linkedin.py`. Both ways work.**
 
 <br>
 
