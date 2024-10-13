@@ -5,6 +5,7 @@ import time
 from selenium import webdriver
 import config
 from selenium.webdriver.chrome.options import Options as ChromeOptions, Options
+from Finding_Elements import signin_mod
 
 
 def check_selenium_linkedin():
@@ -26,6 +27,7 @@ def check_selenium_linkedin():
         time.sleep(5)
 
         # Import the sign in fuctionality from signin_mod.py
+        # Located in LinkedIn_Apply/Finding_Elements/signin_mod.py
         from signin_mod import Find_Sign_In_Button
         find_sign_in_button = Find_Sign_In_Button(browser)
         find_sign_in_button.use_xpath()  # Try to find the button using XPath.
