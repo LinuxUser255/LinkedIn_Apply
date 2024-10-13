@@ -27,9 +27,10 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 **Completing the Easy apply section**
 - [x] Resolve the click on "Easy apply" button: Works in `click_button_test.py`
+- [x] Implement separation of concerns for finding and clicking elements
 
 - [ ]  Create functionality to handle the submit apply pop-up. 
-	- [ ]  Filling the three fields, 
+	- [ ] Filling the three fields, 
 	- [ ] selecting your resume, 
 	- [ ] clicking submit application and 
 	- [ ] close the thank you for applying pop up, and repeat
