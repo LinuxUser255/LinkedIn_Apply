@@ -1,3 +1,11 @@
+"""This module was specifically created for, and responsible for, 
+   locating the Sign in button on the login page.
+   It can be imported into any script that requires account login. This includes:
+   test_login.py 
+   &
+   linkedin.py
+"""
+
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
