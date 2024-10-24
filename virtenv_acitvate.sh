@@ -4,7 +4,7 @@ echo ''
 echo 'activating virtual environment'
 echo ''
 
-python -m venv env
+python3 -m venv env
 echo ''
 
 
