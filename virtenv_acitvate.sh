@@ -8,7 +8,7 @@ python -m venv env
 echo ''
 
 
-source env/bin/activae
+source env/bin/activate
 echo ''
 
 echo ''
