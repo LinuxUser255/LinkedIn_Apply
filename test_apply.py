@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 The job of this script is to
-Sign in then linkedin
+Sign in then LinkedIn
 navigate to the provided job listing URL in Provided/job_link.txt
 Click on the 'Apply' button on the job listing page.
 """
@@ -11,7 +11,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-
+from ezapply_mod import ApplyButtonClicker
 import config
 
 
@@ -58,7 +58,7 @@ class LinkedInClickApply:
                 print('Login successful')
                 print('Now navigating to job listing...')
                 self.navigate_to_job_listing()
-                self.click_apply_button()
+           #     self.try_click_apply_button()
             else:
                 print('Login failed')
                 # if login fails, keep the browser window open for manual inspection.
@@ -75,34 +75,38 @@ class LinkedInClickApply:
             with open('Provided/job_link.txt', 'r') as file:
                 job_link = file.readline().strip()
             self.driver.get(job_link)
+            time.sleep(3)  # wait three seconds for the page to load before clicking the apply button.
+            self.try_click_apply_button()
         except Exception as e:
             print(f"Error navigating to job listing: {e}")
 
-    # Use ezapply_mod.py to click the 'Apply' button on the job listing page
-    def click_apply_button(self):
-        try:
-            # import the ezapply_mod.py and implement its functionality.
-            from ezapply_mod import ApplyButtonClicker
-            apply_button_clicker = ApplyButtonClicker(self.driver)
-            apply_button_clicker.click_easy_apply_button_regular_xpath()  # Try to find the button using regular XPath.
+    # Using the ApplyButtonClicker class from ezapply_mod.py to click the 'Apply' button
+    def try_click_apply_button(self):
+        clicker = ApplyButtonClicker(self.driver)
+        methods = [
+            ('XPath', clicker.click_easy_apply_button_regular_xpath),
+            ('Element selector', clicker.click_easy_apply_button_element)
+        ]
 
-            if not apply_button_clicker.click_easy_apply_button_full_xpath():
-                print('Easy apply button not found.')
+        for method_name, method in methods:
+            print(f'Trying {method_name}...')
+            if method():
+                return True
+            print(f'Easy apply button not found using {method_name}.')
 
-            if not apply_button_clicker.click_easy_apply_button_js_path():
-                print('Easy apply button not found.')
+        return False
 
-            if not apply_button_clicker.click_easy_apply_button_element():
-                print('Easy apply button not found.')
+    @staticmethod
+    def keep_browser_open():
+        print("Keeping browser open. Close manually to exit.")
+        while True:
+            time.sleep(60)
+            print("Browser still open...")
 
-            print('Easy apply button clicked.')
-        except Exception as e:
-            print(f"Error clicking apply button: {e}")
 
     def run_click_apply(self):
         self.login_first()
-        self.navigate_to_job_listing()
-        self.click_apply_button()
+        self.keep_browser_open()
 
 
 if __name__ == "__main__":
