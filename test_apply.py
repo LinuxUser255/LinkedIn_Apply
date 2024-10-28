@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 The job of this script is to
-Sign in then LinkedIn
-navigate to the provided job listing URL in Provided/job_link.txt
-Click on the 'Apply' button on the job listing page.
+1. Sign In
+2. navigate to the provided job listing URL in Provided/job_link.txt
+3. Use the ApplyButtonClicker class from ezapply_mod.py to click the 'Apply' button
 """
 
 import time
