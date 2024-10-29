@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 The job of this script is to
-1. Sign In
-2. navigate to the provided job listing URL in Provided/job_link.txt
-3. Use the ApplyButtonClicker class from ezapply_mod.py to click the 'Apply' button
+Sign in then LinkedIn
+navigate to the provided job listing URL in Provided/job_link.txt
+Click on the 'Apply' button on the job listing page.
 """
 
 import time
@@ -41,17 +41,18 @@ class LinkedInClickApply:
             find_sign_in_button = FindSignInButton(self.driver)
             find_sign_in_button.use_xpath()  # Try to find the button using XPath.
 
-            if not find_sign_in_button.use_full_xpath():
-                print('Sign in button not found.')
-
-            if not find_sign_in_button.use_element_find():
-                print('Sign in button not found.')
-
-            if not find_sign_in_button.use_js_path():
-                print('Sign in button not found.')
-
-            if not find_sign_in_button.use_styles():
-                print('Sign in button not found.')
+#            Currently not using these. But keeping here for now. 
+#            if not find_sign_in_button.use_full_xpath():
+#                print('Sign in button not found.')
+#
+#            if not find_sign_in_button.use_element_find():
+#                print('Sign in button not found.')
+#
+#            if not find_sign_in_button.use_js_path():
+#                print('Sign in button not found.')
+#
+#            if not find_sign_in_button.use_styles():
+#                print('Sign in button not found.')
 
             # Check if the login was successful & if so, then navigate to the job listing page.
             if self.driver.current_url == 'https://www.linkedin.com/feed/':
@@ -95,6 +96,24 @@ class LinkedInClickApply:
             print(f'Easy apply button not found using {method_name}.')
 
         return False
+
+        # Use submit_contact_info method from ezapply_mod.py to click the 'Next' button
+    def click_next_button(self):
+        print('Trying to click Next button...')
+        clicker = ApplyButtonClicker(self.driver)
+        methods = [
+            ('XPath', clicker.submit_contact_info()),
+            ('Element selector', clicker.submit_contact_info())
+        ]
+
+        for method_name, method in methods:
+            print(f'Trying {method_name}...')
+            if method():
+                return True
+            print(f'Easy apply button not found using {method_name}.')
+
+        return False
+
 
     @staticmethod
     def keep_browser_open():
