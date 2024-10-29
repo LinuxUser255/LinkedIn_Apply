@@ -31,11 +31,10 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 - [x] Create module for testing sign in
 - [x] Create a module to test login and apply
 
-- [ ]  Create functionality to handle the submit apply pop-up. 
-	- [ ] Filling the three fields, 
-	- [ ] selecting your resume, 
-	- [ ] clicking submit application and 
-	- [ ] close the thank you for applying pop up, and repeat
+- [x]  Create functionality to handle the submit apply pop-up.  
+	- [x] clicking Next (submit application) and 
+	- [x] click review
+	- [ ] Modify test_apply.py to be re-run without repeating the login everytime
 
 - [ ] Integrate the four methods used to click the Easy Apply button into `linkedin.py`
   - [ ] _Do this using a nested function??_
