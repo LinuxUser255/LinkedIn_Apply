@@ -97,10 +97,10 @@ class LinkedInClickApply:
             # stay logged in until user closes the browser
 
     def click_next_button(self):
-        print('Trying to click the Next button, using test_apply.py...')
+                print('Trying to click the Next button, using test_apply.py...')
         try:
-            # Use a more flexible XPath that targets the specific span element
-            xpath = "//span[contains(@class, 'artdeco-button__text') and normalize-space(text())='Next']/parent::button"
+            # Use a more precise XPath that targets the specific button element
+            xpath = "//button[@aria-label='Continue to next step' and contains(@class, 'artdeco-button--primary') and @data-easy-apply-next-button]"
 
             # Wait for the element to be clickable
             wait = WebDriverWait(self.driver, 10)
@@ -114,6 +114,9 @@ class LinkedInClickApply:
             time.sleep(5)
         except Exception as e:
             print(f"Error clicking Next button: {str(e)}")
+            # Log more details about the current page
+            print(f"Current URL: {self.driver.current_url}")
+            print(f"Page source: {self.driver.page_source[:500]}...")  # Print first 500 characters of page source
             # Stay logged in until user closes the browser
             self.keep_browser_open()
 
