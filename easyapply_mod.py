@@ -4,6 +4,11 @@ and click the easy apply button on a LinkedIn job listing page.
 """
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import re
+
 
 # Still unable to find and click the sign in button regardless of the method used.
 
@@ -15,13 +20,11 @@ class ApplyButtonClicker:
     def click_easy_apply_button_regular_xpath(self):
         print('Using regular XPath...')
         try:
-            # accept any number for the ember element ID
-            easy_apply_button = self.driver.find_element(By.XPATH, '//button[starts-with(@id, "ember")]')
-            if easy_apply_button:
-                easy_apply_button.click()
-                print('Easy apply button clicked using regular XPath.')
-            else:
-                print('Easy apply button not found using regular XPath.')
+            # Use a more flexible XPath that doesn't rely on specific IDs
+            xpath = "//button[contains(@class, 'jobs-apply-button') and contains(@aria-label, 'Easy Apply')]"
+            wait = WebDriverWait(self.driver, 10)
+            easy_apply_button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+
             if easy_apply_button:
                 easy_apply_button.click()
                 print('Easy apply button clicked using regular XPath.')
@@ -30,27 +33,21 @@ class ApplyButtonClicker:
         except Exception as e:
             print(f'Error clicking easy apply button using regular XPath: {e}')
 
-    # Method uses the page element find for the easy apply button using The Element selector
+
     def click_easy_apply_button_element(self):
-        print('Trying Element...')
+        print('Trying Element with regex...')
         try:
-            # the element to search for and click:
-            # <button aria-label="Easy Apply to " id="ember" class="jobs-apply-button artdeco-button artdeco-button--3 artdeco-button--primary ember-view">
-            # <svg role="none" aria-hidden="true" class="artdeco-button__icon artdeco-button__icon--in-bug" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" data-supported-dps="14x14" data-test-icon="linkedin-bug-xxsmall">
-            # <!---->
-            #     <use href="#linkedin-bug-xxsmall" width="14" height="14"></use>
-            # </svg>
-            #
-            #
-            # <span class="artdeco-button__text">
-            #     Easy Apply
-            # </span></button>
-            easy_apply_button = self.driver.find_element(By.CSS_SELECTOR, '#ember > svg[role="none"][aria-hidden="true"]''.artdeco-button__icon')
+            # Use WebDriverWait to wait for the element to be present
+            wait = WebDriverWait(self.driver, 10)  # Wait up to 10 seconds
+            easy_apply_button = wait.until(
+                EC.presence_of_element_located((By.XPATH,
+                                                "//button[contains(@class, '') and .//span[contains(text(), 'Easy Apply')]]"))
+            )
+            easy_apply_button = self.driver .find_element(By.XPATH, "//div[@class='card-layout']")
             if easy_apply_button:
                 easy_apply_button.click()
-                print('Easy apply button clicked using Element Selector.')
+                print('Easy apply button clicked using Element Selector with regex.')
             else:
-                print('Easy apply button Not found using Element Selector.')
+                print('Easy apply button Not found using Element Selector with regex.')
         except Exception as e:
-            print(f'Error clicking easy apply button using Element selector: {e}')
-
+            print(f'Error clicking easy apply button using Element selector with regex: {e}')
