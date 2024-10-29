@@ -6,6 +6,7 @@ Sign in then LinkedIn
 navigate to the provided job listing URL in Provided/job_link.txt
 Click on the 'Apply' button on the job listing page.
 """
+import multiprocessing
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -15,9 +16,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 
+# def keep_browser_open():
+#    print("Keeping browser open. This is being run directly from test_apply.py.. Close manually to exit.")
+#   while True:
+#      time.sleep(60)
+#     print("Browser still open...")
 
 class LinkedInClickApply:
     def __init__(self) -> None:
+        self.run_click_apply = None
         options = Options()
         options.add_argument("--window-size=800,600")
         options.add_argument("--ignore-certificate-errors")
@@ -120,6 +127,14 @@ class LinkedInClickApply:
             # Stay logged in until user closes the browser
             self.keep_browser_open()
 
+    # Create a method that will  enable you to re-run the script while currently signed in
+    # Enable test_apply to be to run in parallel
+#    def run_in_parallel(self):
+#       print("Running test_apply.py in parallel...")
+#        # Use multiprocessing to run the script in parallel
+#       process = multiprocessing.Process(target=self.run_click_apply)
+#      process.start()
+
 
     @staticmethod
     def keep_browser_open():
@@ -137,3 +152,4 @@ class LinkedInClickApply:
 if __name__ == "__main__":
     linkedin_click_apply = LinkedInClickApply()
     linkedin_click_apply.run_click_apply()
+   # linkedin_click_apply.run_in_parallel()
