@@ -16,7 +16,13 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 # TO DO - Fixes and Changes 
 
+
 **In order of most to least important**
+
+**How the Bot works**
+- [ ] Create an Excalabur Draw diagram - high-level overview of how this bot works
+
+<br>
 
 **Browser handling issues**
 - [x] Eliminate launching a new browser/login session with each iteration.
