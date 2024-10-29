@@ -14,6 +14,7 @@ import re
 
 class ApplyButtonClicker:
     def __init__(self, driver):
+        self.click_easy_apply_button_element = None
         self.driver = driver
 
     # method to find and click the easy apply button using the Regular Xpath
@@ -33,21 +34,19 @@ class ApplyButtonClicker:
         except Exception as e:
             print(f'Error clicking easy apply button using regular XPath: {e}')
 
-
-    def click_easy_apply_button_element(self):
-        print('Trying Element with regex...')
+    def submit_contact_info(self):
+        # Use a robust Xpath & regex to find and submit the "Next" button using this xpath //*[@id="ember305"]/span
+        print('Trying to click Next button...')
         try:
-            # Use WebDriverWait to wait for the element to be present
-            wait = WebDriverWait(self.driver, 10)  # Wait up to 10 seconds
-            easy_apply_button = wait.until(
-                EC.presence_of_element_located((By.XPATH,
-                                                "//button[contains(@class, '') and .//span[contains(text(), 'Easy Apply')]]"))
-            )
-            easy_apply_button = self.driver .find_element(By.XPATH, "//div[@class='card-layout']")
-            if easy_apply_button:
-                easy_apply_button.click()
-                print('Easy apply button clicked using Element Selector with regex.')
+            xpath = "//button[contains(@class, 'next-button') and contains(@aria-label, 'Next')]"
+            wait = WebDriverWait(self.driver, 10)
+            next_button = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+
+            if next_button:
+                next_button.click()
+                print('Next button clicked.')
             else:
-                print('Easy apply button Not found using Element Selector with regex.')
+                print('Next button not found.')
         except Exception as e:
-            print(f'Error clicking easy apply button using Element selector with regex: {e}')
+            print(f'Error clicking Next button: {e}')
+
