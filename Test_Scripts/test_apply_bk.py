@@ -2,6 +2,8 @@
 
 """
 This is a backup of my working test_apply.py script..before any rerun or async changes were made
+This one is also heavily reliant on modules, which I have done away with in the 
+most recent edition of this script
 
 The job of this script is to
 Sign in then LinkedIn
@@ -43,7 +45,8 @@ class LinkedInClickApply:
             from Bkup_files.signin_mod import FindSignInButton
             find_sign_in_button = FindSignInButton(self.driver)
             find_sign_in_button.use_xpath()  # Try to find the button using XPath.
-
+            
+# Using Xpath finders for button clicking from external moduls
             if not find_sign_in_button.use_full_xpath():
                 print('Sign in button not found.')
 
