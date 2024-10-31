@@ -159,11 +159,6 @@ class LinkedInClickApply:
         self.signin()
         self.keep_browser_open()
 
-#def keep_browser_open():
-#    print("Keeping browser open. This is being run directly from test_apply.py.. Close manually to exit.")
-#    while True:
-#        time.sleep(60)
-#        print("Browser still open...")
 
 if __name__ == "__main__":
     linkedin_click_apply = LinkedInClickApply()
