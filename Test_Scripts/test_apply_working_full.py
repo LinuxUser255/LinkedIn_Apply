@@ -8,7 +8,7 @@ Click on the 'Apply' button on the job listing page.
 """
 #import multiprocessing
 import time
-from time import sleep
+import os
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -16,7 +16,13 @@ from selenium.webdriver.common.by import By
 import config
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import re
+
+
+def keep_browser_open():
+    print("Keeping browser open. This is being run directly from test_apply.py.. Close manually to exit.")
+    while True:
+        time.sleep(60)
+        print("Browser still open...")
 
 
 class LinkedInClickApply:
@@ -52,7 +58,7 @@ class LinkedInClickApply:
                 print('Sign in successful from test_apply.py....')
                 # If the sign in was successful, then navigate to the job listing page
                 self.navigate_to_job_listing()
-                time.sleep(5)
+                time.sleep(8)
 
                 # Apply to the job
                 self.try_click_easy_apply_button()
@@ -72,15 +78,27 @@ class LinkedInClickApply:
 
     # Retrieve the job link from Provided/job_link.txt file and navigate to that page
     def navigate_to_job_listing(self):
-        print('Navigating to job listing, using test_appy.py ...')
+        print('Navigating to job listing, using test_apply.py ...')
         try:
-            with open('Provided/job_link.txt', 'r') as file:
+            # Get the directory of the current script
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            # Construct the full path to the job_link.txt file
+            file_path = os.path.join(current_dir, 'Provided', 'job_link.txt')
+
+            # Check if the file exists
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"The file {file_path} does not exist.")
+
+            with open(file_path, 'r') as file:
                 job_link = file.readline().strip()
+
             self.driver.get(job_link)
-            time.sleep(5)  # wait three seconds for the page to load before clicking the apply button.
+            time.sleep(5)  # wait five seconds for the page to load before clicking the apply button.
             self.try_click_easy_apply_button()
         except Exception as e:
             print(f"Error navigating to job listing directly using test_apply.py: {e}")
+            # Log the current working directory for debugging
+            print(f"Current working directory: {os.getcwd()}")
 
     # Click the  ' Easy Apply' button
     def try_click_easy_apply_button(self):
@@ -123,8 +141,9 @@ class LinkedInClickApply:
             print(f"Current URL: {self.driver.current_url}")
             print(f"Page source: {self.driver.page_source[:500]}...")  # Print first 500 characters of page source
             # Stay logged in until user closes the browser
-            self.keep_browser_open()
+            keep_browser_open()
 
+# Code execution seems to be stuck here
     def click_review_button(self):
         print('Trying to click the Review button, using test_apply.py...')
         try:
@@ -147,17 +166,11 @@ class LinkedInClickApply:
             print(f"Current URL: {self.driver.current_url}")
             print(f"Page source: {self.driver.page_source[:500]}...")  # Print first 500 characters of page source
             # Stay logged in until user closes the browser
-            self.keep_browser_open()
-
-    def keep_browser_open(self):
-        print("Keeping browser open. This is being run directly from test_apply.py.. Close manually to exit.")
-        while True:
-            time.sleep(60)
-            print("Browser still open...")
+            keep_browser_open()
 
     def run_click_apply(self):
         self.signin()
-        self.keep_browser_open()
+        keep_browser_open()
 
 
 if __name__ == "__main__":
