@@ -32,7 +32,9 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 <br>
 
 **Primary purpose of the Bot: Completion of the Easy apply section**
-- [ ] Wokout the next button click methods in the [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) script
+- [ ] Currently troubleshooting XPath click using:
+  
+## [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) script
 - [ ] Once the above is working, itegrate it's functionality into `linkedin.py`
 - [x] Resolve the click on "Easy apply" button: Works in `click_button_test.py`
 - [x] Implement separation of concerns for finding and clicking elements
