@@ -6,6 +6,8 @@
 
 - This repo/codebase is a work in progress, & is intended to be an updated version of [my other linkedin bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
+## [To test the bot use this script:  test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
+
 <br>
 
 
@@ -104,7 +106,7 @@ pip3 install -r requirements.yml
 ```
 <br>
 
-### The bot can run either by executing `main.py` or `linkedin.py`. Both ways work.**
+### The bot can run either by executing `main.py` or `linkedin.py`. Both ways work.
 
 <br>
 
