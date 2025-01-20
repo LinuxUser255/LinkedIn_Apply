@@ -1,11 +1,5 @@
 selenium
 webdriver_manager
-streamlit
-langchain
-langchain_ollama
 beautifulsoup4
 lxml
-html5lib
 python-dotenv
-ast
-json
