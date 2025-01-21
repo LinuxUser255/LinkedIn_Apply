@@ -83,31 +83,46 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 <br>
 
-## Install & use
+## Installation and Use
 
 ### Clone the repository & Install the requirments**
 ```shell
-
 git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
 
 cd LinkedIn_Apply
 ```
 <br>
 
-#### Download & Activate the virtual enviroment
-```shell
-curl -LO https://raw.githubusercontent.com/LinuxUser255/LinkedIn_Apply/refs/heads/main/virtenv_acitvate.sh | sh virtenv_acitvate.sh 
-```
+## Set up scripts: virtual env and pip3
 
-<br>
-
-### the install pip3 requirements
+### To set up a virtual enviroment
 ```shell
-pip3 install -r requirements.yml
+chmod +x virtenv_activate.sh
+./virtenv_activate.sh
 ```
 <br>
 
-### The bot can run either by executing `main.py` or `linkedin.py`. Both ways work.
+### Automate pip3 updates and install requirements
+
+```shell
+chmod +x update_and_install.sh
+./update_and_install.sh
+````
+
+<br>
+
+## To run the bot:
+
+## Still in testing phase, so use [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) 
+
+When complete use:
+
+`main.py` 
+
+**OR**
+
+`linkedin.py`.
+
 
 <br>
 
