@@ -314,15 +314,30 @@ class LinkedInClickApply:
 
     # The Main method to run the bot
     def run_click_apply(self):
-        print()
-        print("run_click_apply...")
-        print()
         self.signin()
+        self.navigate_to_job_listing()
+        self.try_click_easy_apply_button()
+        self.handle_work_authorization()
+        self.click_next_again_button()
+        self.click_review_button()
+        self.submit_application()
+        self.click_next_button()
+        self.click_done_button()
         keep_browser_open()
 
 
-if __name__ == "__main__":
-    linkedin_click_apply = LinkedInClickApply()
-    linkedin_click_apply.run_click_apply()
+# Needs Fixing
+while True:
+    try:
+        linkedin_click_apply = LinkedInClickApply()
+        linkedin_click_apply.run_click_apply()
+    except Exception as e:
+        print("Error with running while loop linkedin class")
+start = time.time()
+while True:
+    try:
+        LinkedIn().link_job_apply()
+    except Exception as e:
+        print("Error in main: " + str(e))
 
  
