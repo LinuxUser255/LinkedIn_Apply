@@ -31,7 +31,7 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 <br>
 
-# TO DO - Most recent: See TODO.txt
+# TO DO - Most recent: See [TODO.md](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/TODO.md)
 
 
 **Additional items. Some completed.**
