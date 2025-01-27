@@ -1,13 +1,27 @@
 # LinkedIn_Apply
 
+
+**Built with**
+
+![PythonLogo](https://github.com/user-attachments/assets/4c25054e-c5b1-4577-b1cc-35930bc6cae6)    
+![SeleniumLoge](https://github.com/user-attachments/assets/cef6469b-8193-41ac-b663-992b2a788c0a)
+
+
+
+<br>
+
+
+
 ## A Python bot that will apply to the, "Easy Apply", jobs based on your preferences.
 
-- I may be adding Streamlit and Ollama at somepoint. Therefore, they are in the requirements.txt
+- I may be adding Ollama at somepoint.
 
 - This repo/codebase is a work in progress, & is intended to be an updated version of [my other linkedin bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
+<br>
+
 ## [To test the bot use this script:  test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
-**There are many other test scripts for various trouble shooting & other use-cases in the Test_Scripts folder**
+
 
 <br>
 
@@ -17,13 +31,10 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 <br>
 
-# TO DO - Fixes and Changes 
+# TO DO - Most recent: See TODO.txt
 
 
-**In order of most to least important**
-
-**How the Bot works**
-- [ ] Create an Excalabur Draw diagram - high-level overview of how this bot works
+**Additional items. Some completed.**
 
 <br>
 
@@ -53,7 +64,7 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
   - [ ] _Do this using a nested function??_
 
 
-- [ ] Tie it all together in `main.py`
+- [x] Tie it all together in `main.py`
 
 
 <br>
@@ -111,9 +122,8 @@ chmod +x update_and_install.sh
 
 <br>
 
-## To run the bot:
+## To run the bot as of now, use: [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)  
 
-## Still in testing phase, so use [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) 
 
 When complete use:
 
