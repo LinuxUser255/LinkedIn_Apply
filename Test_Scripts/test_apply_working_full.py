@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 """
-The job of this script is to
-Sign in then LinkedIn
-navigate to the provided job listing URL in Provided/job_link.txt
-Click on the
-'Easy Apply', then follow the remaining steps in the easy Apply process.
+The job of this script is to work out the correct automation of the 'Easy appy' process.
+1. Sign in to LinkedIn.
+2. Navigate to the provided job listing URL from Provided/job_link.txt
+3. Find and click on all the buttons that are part of the 'Easy apply' process.
+4. Once this is worked out, then the functionality of this script, will be implemented in linkedin.py.
+5. The most consistant obstical in this project, has been, coding the correct xpath variable-value, for each button that must be clicked.
+6. I've attempted to make this code as clean, and self-documenting as possible.
 """
 
 import os
