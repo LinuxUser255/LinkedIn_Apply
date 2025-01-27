@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-The job of this script is to work out the correct automation of the 'Easy appy' process.
+The job of this script is to work out the correct automation procedure, of the, 'Easy appy' process.
 1. Sign in to LinkedIn.
 2. Navigate to the provided job listing URL from Provided/job_link.txt
 3. Find and click on all the buttons that are part of the 'Easy apply' process.
