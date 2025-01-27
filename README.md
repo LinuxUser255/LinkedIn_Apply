@@ -6,7 +6,7 @@
 ![PythonLogo](https://github.com/user-attachments/assets/4c25054e-c5b1-4577-b1cc-35930bc6cae6)    
 ![SeleniumLoge](https://github.com/user-attachments/assets/cef6469b-8193-41ac-b663-992b2a788c0a)
 
-**[Selenium](https://selenium-python.readthedocs.io/)**
+**[Selenium docs](https://selenium-python.readthedocs.io/)**
 
 
 
