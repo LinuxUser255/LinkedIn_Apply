@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
 """
-The job of this script is to work as a kinda diagnostic script for troubleshooting errors etc..
-First: it signs in then LinkedIn
-Second: Navigates to the provided job listing URL in Provided/job_link.txt
-Third: Click on the 'Easy Apply', then follows the remaining steps in the easy Apply process.
-The code self documents via each method, (function)
+The job of this script is to
+Sign in then LinkedIn
+navigate to the provided job listing URL in Provided/job_link.txt
+Click on the
+'Easy Apply', then follow the remaining steps in the easy Apply process.
 """
+
 import os
 import time
 
@@ -114,6 +115,7 @@ class LinkedInClickApply:
             except:
                 self.driver.execute_script("arguments[0].click();", button)
 
+# Need to test this code, it is not clicking the Next button on the Upload resume page.
     def click_next_button(self) -> None:
         print('Upload resume')
         print('Click Next Button Method Running...\n')
@@ -132,13 +134,16 @@ class LinkedInClickApply:
 
     def handle_work_authorization(self) -> None:
         try:
-            xpath = (r"//*[contains(@id, 'radio-button-form-component-formElement-urn-li-jobs-applyformcommon"
-                     r"-easyApplyFormElement-4129161503-8437332817-multipleChoice') and contains(@for, "
-                     r"'urn:li:fsd_formElement:urn:li:jobs_applyformcommon_easyApplyFormElement:(4129161503,"
-                     r"8437332817,multipleChoice)-1')]")
-            self.driver.find_element(By.XPATH, xpath).click()
-            print('Work authorization selected as No...\n')
-            self.click_next_again_button()
+            # xpath_auth = //*[@id="ember424"]/div/div[2]/form/div/div/h3
+            work_auth_element = self.driver.find_elements(By.XPATH, xpath)
+            
+            if work_auth_element:
+                work_auth_element[0].click()
+                print('Work authorization selected as No...\n')
+                self.click_next_again_button()
+            else:
+                print('Work authorization question not found. Proceeding...\n')
+                self.click_next_again_button()
         except Exception as e:
             print(f"Error handling work authorization: {str(e)}\n")
             keep_browser_open()
@@ -146,12 +151,21 @@ class LinkedInClickApply:
     def click_next_again_button(self) -> None:
         print('Click Next Again Button Method Running...\n')
         try:
-            xpath = (r"//button[contains(@id, 'ember') and contains(@class, 'artdeco-button--primary') and (contains("
-                     r"@aria-label, 'Next') or contains(@aria-label, 'Continue'))]")
-            next_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            print("Attempting to click Next button, click_next_button...\n")
+            # Create xpath_two variable with the new XPath
+            xpath_two = ("//button[contains(@id, 'ember') and @class='artdeco-button artdeco-button--2 "
+                         "artdeco-button--primary ember-view' and @data-easy-apply-next-button and "
+                         "@data-live-test-easy-apply-next-button and .//span[text()='Next']]")
+    
+            # Wait for the element to be clickable
+            next_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, xpath_two))
+            )
+    
+            print("Attempting to click Next button...\n")
             next_button.click()
-            print('Next button clicked using click_next_button ....\n')
+            print('Next button clicked successfully...\n')
+    
+            # Continue with the rest of the process
             self.click_next_button()
             time.sleep(5)
         except Exception as e:
@@ -212,4 +226,4 @@ class LinkedInClickApply:
 if __name__ == "__main__":
     linkedin_click_apply = LinkedInClickApply()
     linkedin_click_apply.run_click_apply()
- 
+
