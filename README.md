@@ -14,7 +14,7 @@
 
 ## A Python bot that will apply to the, "Easy Apply", jobs based on your preferences.
 
-- I may be adding Ollama at somepoint.
+- I may be adding Ollama at some point in the future.
 
 - This repo/codebase is a work in progress, & is intended to be an updated version of [my other linkedin bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
