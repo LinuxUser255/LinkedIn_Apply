@@ -20,7 +20,7 @@
 
 <br>
 
-## [To test the bot use this script:  test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
+## To test this bot run the script:  [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
 
 
 <br>
