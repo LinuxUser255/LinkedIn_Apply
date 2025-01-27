@@ -117,7 +117,6 @@ class LinkedInClickApply:
             except:
                 self.driver.execute_script("arguments[0].click();", button)
 
-# Need to test this code, it is not clicking the Next button on the Upload resume page.
     def click_next_button(self) -> None:
         print('Upload resume')
         print('Click Next Button Method Running...\n')
@@ -134,9 +133,9 @@ class LinkedInClickApply:
             print(f"\nError clicking Next button: {str(e)}\n")
             keep_browser_open()
 
+    # This methodd needs more functionality added. See TODO.md for details.
     def handle_work_authorization(self) -> None:
         try:
-            # xpath_auth = //*[@id="ember424"]/div/div[2]/form/div/div/h3
             work_auth_element = self.driver.find_elements(By.XPATH, xpath)
             
             if work_auth_element:
