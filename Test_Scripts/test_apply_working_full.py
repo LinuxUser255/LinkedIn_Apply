@@ -9,21 +9,21 @@ Order of operations:
 
 1. First Action:  Click the 1st Easy Apply button.
 
-2. Second Action: Click Next button on the Contact info popup
+2. Second Action: Click Next button on the Contact info popup.
 
-3. Third Action: Click Next button on Upload resume
+3. Third Action: Click Next button on Upload resume.
 
-4. Fourth Action: Click Next button on Additional questions
+4. Fourth Action: Click Next button on Additional questions.
 
-5. Fith Action: Click the down arrow for Dropdown menu
+5. Fith Action: Click the down arrow on the Drop-down menu.
 
-6. Sixth Action: Select either Yes of No to certs (default set to No)
+6. Sixth Action: Select either Yes of No to certs, (default set to No).
 
-7. Seventh Action: Click Next on the Additional questions box
+7. Seventh Action: Click Next on the Additional questions box.
 
-8. Eighth Action: Click Review on Work Auth, (default set to Yes)
+8. Eighth Action: Click Review on Work Auth, (default set to Yes).
 
-9. Ninth Action: Click Submit Application
+9. Ninth Action: Click Submit Application.
 
 See the, `def handle_work_authorization(self) -> None:` , method, for latest debug.
 """
