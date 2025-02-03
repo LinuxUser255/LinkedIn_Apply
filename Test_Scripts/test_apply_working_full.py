@@ -128,13 +128,14 @@ class LinkedInClickApply:
                 self.driver.execute_script("arguments[0].click();", button)
 
 
-    # This one was tough. But works now. See comments.
+    # !! Currently, this is not clicking the Next button on the Upload resume page.
     # UPLOAD RESUME: Change the name of this method
     def resume_pop_up_box(self) -> None:
         print('Handling The Resume Pop-Up Box:\n')
         try:
             # //*[@id="ember353"]/span
-            resume_popup_xpath = "//button[contains(@id, 'ember') and contains(@class, 'artdeco-button--primary') and (contains(@aria-label, 'Next') or contains(@aria-label, 'Continue'))]"
+            resume_popup_xpath = ("//button[contains(@id, 'ember') and contains(@class, 'artdeco-button--primary') and "
+                                  "(contains(@aria-label, 'Next') or contains(@aria-label, 'Continue'))]")
     
             next_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, resume_popup_xpath)))
             time.sleep(2)
@@ -200,7 +201,7 @@ class LinkedInClickApply:
             print(f"Page source: {self.driver.page_source[:500]}...")
             keep_browser_open()
 
-            # OK, ALL THAT WORKED ^^^^^^^ Doubled up. Ran that nested try-except blocks. Twice. 
+            # OK, ALL THAT WORKED ^^^^^^^
 
 
     # ADDITIONAL QUESTIONS: Certifications
@@ -208,7 +209,8 @@ class LinkedInClickApply:
         print('Handling the Additional Questions Pop-Up Box...\n')
         try:
             # Set the drop_down_menu_xpath
-            drop_down_menu_xpath = "//*[@id='text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4140989961-14995880972-multipleChoice']"
+            drop_down_menu_xpath = ("//*[@id='text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon"
+                                    "-easyApplyFormElement-4140989961-14995880972-multipleChoice']")
             
             # Wait for the dropdown menu to be present and clickable
             drop_down_menu = WebDriverWait(self.driver, 10).until(
@@ -220,7 +222,8 @@ class LinkedInClickApply:
             print('Dropdown menu clicked successfully.\n')
     
             # Wait for the "No certifications" option to be visible and click it
-            no_cert_option_xpath = "//*[@id='text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4140989961-14995880972-multipleChoice']/option[3]"
+            no_cert_option_xpath = ("//*[@id='text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon"
+                                    "-easyApplyFormElement-4140989961-14995880972-multipleChoice']/option[3]")
             no_cert_option = WebDriverWait(self.driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, no_cert_option_xpath))
             )
@@ -327,5 +330,6 @@ class LinkedInClickApply:
 if __name__ == "__main__":
     linkedin_click_apply = LinkedInClickApply()
     linkedin_click_apply.run_click_apply()
+
 
 
