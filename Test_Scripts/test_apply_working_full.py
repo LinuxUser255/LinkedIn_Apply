@@ -136,6 +136,7 @@ class LinkedInClickApply:
             print(f"Error clicking Easy Apply button: {str(e)}\n")
             keep_browser_open()
 
+    # Easy Apply button clicker
     def click_button(self, button: WebElement) -> None:
         try:
             button.click()
@@ -148,8 +149,7 @@ class LinkedInClickApply:
                 self.driver.execute_script("arguments[0].click();", button)
 
 
-    # !! Currently, this is not clicking the Next button on the Upload resume page.
-    # UPLOAD RESUME: Change the name of this method
+    # UPLOAD RESUME
     def resume_pop_up_box(self) -> None:
         print('Handling The Resume Pop-Up Box:\n')
         try:
@@ -221,8 +221,7 @@ class LinkedInClickApply:
             print(f"Page source: {self.driver.page_source[:500]}...")
             keep_browser_open()
 
-            # OK, ALL THAT WORKED ^^^^^^^
-
+            # OK, finally,  THAT WORKED ^^^^^^^ needed that extra nested try-except block.
 
     # ADDITIONAL QUESTIONS: Certifications
     def handle_additional_questions_certs(self) -> None:
@@ -265,7 +264,6 @@ class LinkedInClickApply:
         self.handle_work_authorization()
 
 
-
     # WORK AUTHORIZATION: Clicks the NEXT button on Additional questions box
     def handle_work_authorization(self) -> None:
         """
@@ -288,7 +286,7 @@ class LinkedInClickApply:
         try:
             # Use the provided XPath, accepting any number for the ID
             # Not Working:  work_auth_xpath = "//*[contains(@id, 'ember')]/span" # Error message Is not clickable
-            # So I'm customizing this:
+            # EXPERIMENTING: Trying to make this Element Receive the Click:
             work_auth_clickable_element = '"<use href="#close-medium" width="24" height="24"></use>"'
             # Error message Is not clickable
 #            work_auth_element = WebDriverWait(self.driver, 10).until(
