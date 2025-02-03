@@ -7,23 +7,25 @@ It uses only one job link, that the user places in: /Provided/job_link.txt
 Order of operations:
 =====================
 
-1. First Action:  Click the 1st Easy Apply button.
+1. First Action: Login
 
-2. Second Action: Click Next button on the Contact info popup.
+2. Second Action:  Click the 1st Easy Apply button.
 
-3. Third Action: Click Next button on Upload resume.
+3. Third Action: Click Next button on the Contact info popup.
 
-4. Fourth Action: Click Next button on Additional questions.
+4. Fourth Action: Click Next button on Upload resume.
 
-5. Fith Action: Click the down arrow on the Drop-down menu.
+5. Fith Action: Click Next button on Additional questions.
 
-6. Sixth Action: Select either Yes of No to certs, (default set to No).
+6. Sixth Action: Click the down arrow on the Drop-down menu.
 
-7. Seventh Action: Click Next on the Additional questions box.
+7. Seventh Action: Select either Yes of No to certs, (default set to No).
 
-8. Eighth Action: Click Review on Work Auth, (default set to Yes).
+8. Eighth Action: Click Next on the Additional questions box.
 
-9. Ninth Action: Click Submit Application.
+9. Ninth Action: Click Review on Work Auth, (default set to Yes).
+
+10. Tenth Action: Click Submit Application.
 
 See the, `def handle_work_authorization(self) -> None:` , method, for latest debug.
 """
