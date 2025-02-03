@@ -128,7 +128,7 @@ class LinkedInClickApply:
                 self.driver.execute_script("arguments[0].click();", button)
 
 
-    # !! Currently, this is not clicking the Next button on the Upload resume page.
+    # This one was tough. But works now. See comments.
     # UPLOAD RESUME: Change the name of this method
     def resume_pop_up_box(self) -> None:
         print('Handling The Resume Pop-Up Box:\n')
@@ -200,7 +200,7 @@ class LinkedInClickApply:
             print(f"Page source: {self.driver.page_source[:500]}...")
             keep_browser_open()
 
-            # OK, ALL THAT WORKED ^^^^^^^
+            # OK, ALL THAT WORKED ^^^^^^^ Doubled up. Ran that nested try-except blocks. Twice. 
 
 
     # ADDITIONAL QUESTIONS: Certifications
