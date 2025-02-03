@@ -1,11 +1,31 @@
 #!/usr/bin/env python3
 
 """
-The job of this script is to
-Sign in then LinkedIn
-navigate to the provided job listing URL in Provided/job_link.txt
-Click on the
-'Easy Apply', then follow the remaining steps in the easy Apply process.
+This script is used to test the auto apply process.
+It uses only one job link, that the user places in: /Provided/job_link.txt
+
+Order of operations:
+=====================
+
+1. First Action:  Click the 1st Easy Apply button.
+
+2. Second Action: Click Next button on the Contact info popup
+
+3. Third Action: Click Next button on Upload resume
+
+4. Fourth Action: Click Next button on Additional questions
+
+5. Fith Action: Click the down arrow for Dropdown menu
+
+6. Sixth Action: Select either Yes of No to certs (default set to No)
+
+7. Seventh Action: Click Next on the Additional questions box
+
+8. Eighth Action: Click Review on Work Auth, (default set to Yes)
+
+9. Ninth Action: Click Submit Application
+
+See the, `def handle_work_authorization(self) -> None:` , method, for latest debug.
 """
 
 import os
