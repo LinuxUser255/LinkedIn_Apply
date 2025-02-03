@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
 """
-The job of this script is to work out the correct automation procedure, of the, 'Easy appy' process.
-1. Sign in to LinkedIn.
-2. Navigate to the provided job listing URL from Provided/job_link.txt
-3. Find and click on all the buttons that are part of the 'Easy apply' process.
-4. Once this is worked out, then the functionality of this script, will be implemented in linkedin.py.
-5. The most consistant obstical in this project, has been, coding the correct xpath variable-value, for each button that must be clicked.
-6. I've attempted to make this code as clean, and self-documenting as possible.
+The job of this script is to
+Sign in then LinkedIn
+navigate to the provided job listing URL in Provided/job_link.txt
+Click on the
+'Easy Apply', then follow the remaining steps in the easy Apply process.
 """
 
 import os
@@ -42,6 +40,8 @@ class LinkedInClickApply:
         options.add_argument("--disable-dev-shm-usage")
         self.driver = webdriver.Chrome(options=options)
 
+
+   # SIGN IN TO YOUR ACCOUNT
     def signin(self) -> None:
         try:
             self.driver.get('https://www.linkedin.com/login')
@@ -59,7 +59,7 @@ class LinkedInClickApply:
             sign_in_button.click()
 
             if self.driver.current_url == 'https://www.linkedin.com/feed/':
-                print('\nSign In Method Running....\n')
+                print('\nSign In Button Clicked....\n')
                 self.navigate_to_job_listing()
                 time.sleep(8)
                 self.try_click_easy_apply_button()
@@ -67,7 +67,8 @@ class LinkedInClickApply:
                 time.sleep(5)
                 if self.driver.current_url.startswith('https://www.linkedin.com/jobs/search/'):
                     print('Job application form loaded successfully....')
-                    self.click_next_button()
+                    #self.click_next_button()
+                    self.navigate_to_job_listing()
                 else:
                     print('\nJob application form not loaded successfully...\n')
 
@@ -76,6 +77,8 @@ class LinkedInClickApply:
         except Exception as e:
             print(f"\nA sign in error occurred: {e}\n")
 
+
+   # GO TO THE JOB LISTING URL
     def navigate_to_job_listing(self) -> None:
         print('\nNavigating to Job Listing Method Running ...\n')
         try:
@@ -93,8 +96,10 @@ class LinkedInClickApply:
             print(f"\nError navigating to job listing: {e}")
             print(f"Current working directory: {os.getcwd()}\n")
 
+
+    # CLICK ON THE 'Easy Apply' BUTTON
     def try_click_easy_apply_button(self) -> None:
-        print('Try Click Easy Apply Button Method Running...')
+        print('Attempting to Click Easy Apply Button...\n')
         try:
             xpath = "//button[contains(@class, 'jobs-apply-button') and contains(@aria-label, 'Easy Apply')]"
             button = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
@@ -103,7 +108,10 @@ class LinkedInClickApply:
             self.click_button(button)
             print('Easy Apply button clicked successfully\n')
             time.sleep(5)
-            self.click_next_button()
+
+            # Call the resume_pop_up_box method after successfully clicking the Easy Apply button
+           #  self.resume_pop_up_box() # trying to call it in the method below
+            self.click_button(button)
         except Exception as e:
             print(f"Error clicking Easy Apply button: {str(e)}\n")
             keep_browser_open()
@@ -111,120 +119,213 @@ class LinkedInClickApply:
     def click_button(self, button: WebElement) -> None:
         try:
             button.click()
+            # Call the resume_pop_up_box method after successfully clicking the Easy Apply button
+            self.resume_pop_up_box()
         except:
             try:
                 ActionChains(self.driver).move_to_element(button).click().perform()
             except:
                 self.driver.execute_script("arguments[0].click();", button)
 
-    def click_next_button(self) -> None:
-        print('Upload resume')
-        print('Click Next Button Method Running...\n')
+
+    # !! Currently, this is not clicking the Next button on the Upload resume page.
+    # UPLOAD RESUME: Change the name of this method
+    def resume_pop_up_box(self) -> None:
+        print('Handling The Resume Pop-Up Box:\n')
         try:
-            xpath = (r"//button[contains(@id, 'ember') and contains(@class, 'artdeco-button--primary') and (contains("
-                     r"@aria-label, 'Next') or contains(@aria-label, 'Continue'))]")
-            next_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            print("Attempting to click Next button, click_next_button...\n")
-            next_button.click()
-            print("Next button clicked using click_next_button ....\n")
-            self.handle_work_authorization()
+            # //*[@id="ember353"]/span
+            resume_popup_xpath = "//button[contains(@id, 'ember') and contains(@class, 'artdeco-button--primary') and (contains(@aria-label, 'Next') or contains(@aria-label, 'Continue'))]"
+    
+            next_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, resume_popup_xpath)))
+            time.sleep(2)
+            print("Attempting to click Next button on the Resume Pop-Up Box...\n")
+
+            # Try multiple methods to click the button
+            try:
+                next_button.click()
+            except Exception as e:
+                print(f"Direct click failed: {str(e)}")
+                try:
+                    ActionChains(self.driver).move_to_element(next_button).click().perform()
+                    print("ActionChains click successful")
+                except Exception as e:
+                    print(f"ActionChains click failed: {str(e)}")
+                    try:
+                        self.driver.execute_script("arguments[0].click();", next_button)
+                        print("JavaScript click successful")
+                    except Exception as e:
+                        print(f"JavaScript click failed: {str(e)}")
+                        raise Exception("All click methods failed")
+            print("Next button clicked successfully.\n")
+            
+            # Wait for the next page to load
             time.sleep(5)
+            
+            # Verify if the Next button was clicked by searching for the text "Upload resume"
+            # Maybe edit: in.self.driver.page_source.lower():  Because it seems to not be enforced.
+            if "upload resume" in self.driver.page_source.lower():
+                # if "upload resume" in self.driver.page_source.lower(): was successful, proceed to then click the Next button
+                print("Attempting to click the Next Button on the Upload Resume Box...\n")
+                try:
+                    next_button.click()
+                except Exception as e:
+                    print(f"Direct click failed: {str(e)}")
+                    try:
+                        ActionChains(self.driver).move_to_element(next_button).click().perform()
+                        print("ActionChains click successful")
+                    except Exception as e:
+                        print(f"ActionChains click failed: {str(e)}")
+                        try:
+                            self.driver.execute_script("arguments[0].click();", next_button)
+                            print("JavaScript click successful")
+                        except Exception as e:
+                            print(f"JavaScript click failed: {str(e)}")
+                            raise Exception("All click methods failed")
+
+                print("Next button clicked successfully.\n")
+                time.sleep(5)
+
+                # should be clicking the Next button..but it's not working as expected
+                print("Should be clicking the Next button on the Upload resume box.\n")
+                self.handle_additional_questions_certs() # <-- This calls the next method to handle the additional questions/certifications
+                print("Proceeding to the next method: handle_additional_questions_certs.\n")
+            else:
+                print("Failed to click the Next button. 'Upload resume' not found.")
+                print("Current page source:", self.driver.page_source)
+                keep_browser_open()
+        
         except Exception as e:
-            print(f"\nError clicking Next button: {str(e)}\n")
+            print(f"\nError in resume_pop_up_box: {str(e)}")
+            print(f"Current URL: {self.driver.current_url}")
+            print(f"Page source: {self.driver.page_source[:500]}...")
             keep_browser_open()
 
-    # This methodd needs more functionality added. See TODO.md for details.
-    def handle_work_authorization(self) -> None:
+            # OK, ALL THAT WORKED ^^^^^^^
+
+
+    # ADDITIONAL QUESTIONS: Certifications
+    def handle_additional_questions_certs(self) -> None:
+        print('Handling the Additional Questions Pop-Up Box...\n')
         try:
-            work_auth_element = self.driver.find_elements(By.XPATH, xpath)
+            # Set the drop_down_menu_xpath
+            drop_down_menu_xpath = "//*[@id='text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4140989961-14995880972-multipleChoice']"
             
+            # Wait for the dropdown menu to be present and clickable
+            drop_down_menu = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, drop_down_menu_xpath))
+            )
+            
+            # Click the dropdown menu to open it
+            drop_down_menu.click()
+            print('Dropdown menu clicked successfully.\n')
+    
+            # Wait for the "No certifications" option to be visible and click it
+            no_cert_option_xpath = "//*[@id='text-entity-list-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4140989961-14995880972-multipleChoice']/option[3]"
+            no_cert_option = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, no_cert_option_xpath))
+            )
+            no_cert_option.click()
+            print('No certifications option selected.\n')
+    
+            next_button_xpath = "//button[contains(@aria-label, 'Next') or contains(@aria-label, 'Continue')]"
+            next_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, next_button_xpath))
+            )
+            next_button.click()
+            print('Next button clicked successfully. Moving on to Work authorization.\n')
+    
+        except Exception as e:
+            print(f'Error handling additional questions (certifications): {str(e)}\n')
+            print('Attempting to continue with the application process...\n')
+    
+        # Continue with the next step in the application process
+        self.handle_work_authorization()
+
+
+
+    # WORK AUTHORIZATION: Clicks the NEXT button on Additional questions box
+    def handle_work_authorization(self) -> None:
+        """
+        Sticking Pont:
+        Interesting Error Message Received:
+
+        Error handling work authorization:
+        Message: element click intercepted:
+
+        Element <span class="artdeco-button__text">...</span>
+        is not clickable at point (883, 64).
+
+        Other element would receive the click:
+        <use href="#close-medium" width="24" height="24"></use>
+
+        Possible culprit:
+        This error message is likely caused by the element being obscured by another element on the page.
+        """
+        print('Handling the Work Authorization Questions Box...\n')
+        try:
+            # Use the provided XPath, accepting any number for the ID
+            # Not Working:  work_auth_xpath = "//*[contains(@id, 'ember')]/span" # Error message Is not clickable
+            # So I'm customizing this:
+            work_auth_clickable_element = '"<use href="#close-medium" width="24" height="24"></use>"'
+            # Error message Is not clickable
+#            work_auth_element = WebDriverWait(self.driver, 10).until(
+#                EC.element_to_be_clickable((By.XPATH, work_auth_xpath))
+#            )
+            work_auth_element = WebDriverWait(self.driver, 10).until(
+                # The XPath doesn't work, so I'm trying a partial link text instead
+                EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, work_auth_clickable_element))
+            )
+            print('Attempting to click the Work Authorization element...\n')
+
             if work_auth_element:
-                work_auth_element[0].click()
-                print('Work authorization selected as No...\n')
-                self.click_next_again_button()
+                work_auth_element.click()
+                print('Success: Work authorization element clicked...\n')
+                time.sleep(2)  # Wait for any potential changes after clicking
+                self.review_application()
+                print('Proceeding to submit the application...\n')
             else:
-                print('Work authorization question not found. Proceeding...\n')
-                self.click_next_again_button()
+                print('Work authorization element not found. Proceeding to submit application...\n')
+                self.review_application()
         except Exception as e:
             print(f"Error handling work authorization: {str(e)}\n")
+            print(f"Current URL: {self.driver.current_url}")
+            print(f"Page source: {self.driver.page_source[:500]}...")
             keep_browser_open()
 
-    def click_next_again_button(self) -> None:
-        print('Click Next Again Button Method Running...\n')
-        try:
-            # Create xpath_two variable with the new XPath
-            xpath_two = ("//button[contains(@id, 'ember') and @class='artdeco-button artdeco-button--2 "
-                         "artdeco-button--primary ember-view' and @data-easy-apply-next-button and "
-                         "@data-live-test-easy-apply-next-button and .//span[text()='Next']]")
-    
-            # Wait for the element to be clickable
-            next_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, xpath_two))
-            )
-    
-            print("Attempting to click Next button...\n")
-            next_button.click()
-            print('Next button clicked successfully...\n')
-    
-            # Continue with the rest of the process
-            self.click_next_button()
-            time.sleep(5)
-        except Exception as e:
-            print(f"\nError clicking Next button: {str(e)}\n")
-            keep_browser_open()
 
-    def click_review_button(self) -> None:
-        print('\nClick Review_Button Method Running...\n')
-        try:
-            xpath = "//button[@aria-label='Review your application' and contains(@class, 'artdeco-button--primary')]"
-            review_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            print("click_review_button,...\n")
-            review_button.click()
-            print('Review button clicked ...\n')
-            self.submit_application()
-            time.sleep(5)
-        except Exception as e:
-            print(f"\nThere was an Error clicking Review button: {str(e)}")
-            print(f"Current URL: {self.driver.current_url}\n")
-            print(f"Page source: {self.driver.page_source[:500]}...\n")
-            keep_browser_open()
-
-    def submit_application(self) -> None:
+    # REVIEW APPLICATION button
+    # And clicks the Submit Application button
+    # REVIEW APPLICATION button
+    # And clicks the Submit Application button
+    def review_application(self) -> None:
         print('\nSubmit Application Method Running...\n')
         try:
-            xpath = r"//*[contains(@id, 'ember') and contains(@class, 'submit-button') and contains(@aria-label, 'Submit')]"
-            submit_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+            # XPath: //*[@id="ember363"]/span
+            review_application_xpath = "//*[contains(@id, 'ember')]/span"
+            submit_button = WebDriverWait(self.driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH, review_application_xpath))
+            )
             print("Attempting to click Submit button...\n")
             submit_button.click()
             print('Submit button clicked\n')
-            self.click_done_button()
-            time.sleep(5)
+            print('Congrats! Your application has been submitted.\n')
+            time.sleep(5)  # Wait for any potential changes after clicking
         except Exception as e:
             print(f"Error clicking Submit button: {str(e)}")
             print(f"Current URL: {self.driver.current_url}\n")
             print(f"Page source: {self.driver.page_source[:500]}...\n")
             keep_browser_open()
 
-    def click_done_button(self) -> None:
-        print('\nClick Done Button Method Running...\n')
-        try:
-            xpath = r"//*[contains(@id, 'ember') and contains(@class, 'done-button') and contains(@aria-label, 'Done')]"
-            done_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            print("\nAttempting to click Done button...")
-            done_button.click()
-            print('Done button clicked...\n')
-            time.sleep(5)
-        except Exception as e:
-            print(f"\nError clicking Done button: {str(e)}\n")
-            print(f"Current URL: {self.driver.current_url}\n")
-            print(f"Page source: {self.driver.page_source[:500]}...\n")
 
+    # KEEP THE  BROWSER OPEN
     def run_click_apply(self) -> None:
         print("\nrun_click_apply...\n")
         self.signin()
         keep_browser_open()
 
+
 if __name__ == "__main__":
     linkedin_click_apply = LinkedInClickApply()
     linkedin_click_apply.run_click_apply()
+
 
