@@ -7,7 +7,7 @@ It uses only one job link, that the user places in: /Provided/job_link.txt
 Order of operations:
 =====================
 
-1. First Action: Login
+1. First Action: Login & go to the joblink.
 
 2. Second Action:  Click the 1st Easy Apply button.
 
