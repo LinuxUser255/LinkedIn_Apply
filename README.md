@@ -1,4 +1,9 @@
-# LinkedIn_Apply
+
+
+# LinkedIn Job Application Bot
+
+
+![linkedin-logo-02](https://github.com/user-attachments/assets/8829660c-8021-49a2-951f-241ea62394e4)
 
 
 **Built with**
@@ -22,20 +27,22 @@
 
 <br>
 
-# To test this bot run the script:  [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
-# The latest unit test is also in the`/Test_Scripts/` directory.
+# Test script:  [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
 
 
 <br>
 
 
 ## You will need to download the [Chrome Driver](https://googlechromelabs.github.io/chrome-for-testing/#stable) and palce it in the directory alongside the python files
-https://googlechromelabs.github.io/chrome-for-testing/#stable
+**https://googlechromelabs.github.io/chrome-for-testing/#stable**
 
 <br>
 
 # TO DO - Most recent: See [TODO.md](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/TODO.md)
-
+```
+Many of the important ones are complete.
+The next thing is integrating much of the test_apply script functionality into linkedin.py
+```
 
 **Additional items. Some completed.**
 
@@ -49,9 +56,9 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 <br>
 
 **Primary purpose of the Bot: Completion of the Easy apply section**
-- [ ] Currently troubleshooting XPath click using:
+- [x] Currently troubleshooting XPath click using:
   
-## [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) script
+## Try it here: [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) script
 - [ ] Once the above is working, itegrate it's functionality into `linkedin.py`
 - [x] Resolve the click on "Easy apply" button: Works in `click_button_test.py`
 - [x] Implement separation of concerns for finding and clicking elements
@@ -61,10 +68,9 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 - [x]  Create functionality to handle the submit apply pop-up.  
 	- [x] clicking Next (submit application) and 
 	- [x] click review
-	- [ ] Modify test_apply.py to be re-run without repeating the login everytime
+	- [x] Modify test_apply.py to be re-run without repeating the login everytime
 
 - [ ] Integrate the four methods used to click the Easy Apply button into `linkedin.py`
-  - [ ] _Do this using a nested function??_
 
 
 - [x] Tie it all together in `main.py`
@@ -72,7 +78,7 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 
 <br>
 
-  **After all of the Easy apply functionality is complete.**
+  **Cool ideas might try: After all of the Easy apply functionality is complete.**
 - [ ] Make bot able to apply on external links
 - [ ] Make it able to register & logon to external job applications
 
@@ -90,10 +96,9 @@ https://googlechromelabs.github.io/chrome-for-testing/#stable
 **Other**
 - [x] Fix specified HTML element discovery issues
 - [x] ~~Chromium not woking properly with Linux~~
-- [ ] More robustness of the bot for different fields
-- [ ] Add support to other major job seeking websites (Glassdoor, AngelCo, Greenhouse,
+- [x] More robustness of the bot for different fields
+- [ ] Much later, maybe add support to other major job seeking websites (Glassdoor, AngelCo, Greenhouse,
 - [ ] Possibly need? Evade Anti-Bot detection
-- [ ] If necessary, Maybe retrieve and use session cookies from the browser?
 
 <br>
 
