@@ -1,60 +1,61 @@
 # General bot settings
 
-# Some of the following, are general template/examples, edit according to your needs.
+# Chrome-only
 browser = ["Chrome"]
 
-# Optional! run browser in headless mode, no browser screen will be shown it will work in background.
-headless = True
+# Optional: run in headless mode (background)
+headless = False
 
-# Linkedin login creds
+# LinkedIn login creds (optional if using CHROME_PROFILE_PATH in .env)
 email = ""
 password = ""
 
 # These settings are for running Linkedin job apply bot
 LinkedinBotProPassword = ""
 
-# location you want to search the jobs - ex : ["Poland", "Singapore", "New York City Metropolitan Area", "Monroe County"]
-# continent locations:["Europe", "Asia", "Australia", "NorthAmerica", "SouthAmerica", "Africa", "Australia"]
+# Location(s) for job search - examples:
+# ["Poland", "Singapore", "New York City Metropolitan Area", "Monroe County"]
+# Continent shortcuts: ["Europe", "Asia", "Australia", "NorthAmerica", "SouthAmerica", "Africa"]
 location = ["United States"]
 
-# keywords related with your job search
-keywords = ["lead developer", "chief technical officer", "cto", "python"]
+# Keywords related to your job search
+keywords = ["python"]
 
-#job experience Level - ex:  ["Internship", "Entry level" , "Associate" , "Mid-Senior level" , "Director" , "Executive"]
-experienceLevels = ["Entry level", "Mid level"]
+# Job experience Levels - e.g.: ["Internship", "Entry level", "Associate", "Mid-Senior level", "Director", "Executive"]
+experienceLevels = ["Entry level", "Mid-Senior level"]
 
-#job posted date - ex: ["Any Time", "Past Month" , "Past Week" , "Past 24 hours"] - select only one
-datePosted = ["Past 24 hours"] 
+# Date posted - choose one: ["Any Time", "Past Month", "Past Week", "Past 24 hours"]
+datePosted = ["Any Time"]
 
-#job type - ex:  ["Full-time", "Part-time" , "Contract" , "Temporary", "Volunteer", "Intership", "Other"]
-jobType = ["Full-time", "Part-time", "Contract"]
+# Job type(s) - e.g.: ["Full-time", "Part-time", "Contract", "Temporary", "Volunteer", "Intership", "Other"]
+jobType = ["Full-time", "Contract"]
 
-#remote  - ex: ["On-site" , "Remote" , "Hybrid"]
-remote = ["Remote"]
+# Workplace type(s): ["On-site", "Remote", "Hybrid"]
+remote = ["Remote", "Hybrid"]
 
-#salary - ex:["$40,000+", "$60,000+", "$80,000+", "$100,000+", "$120,000+", "$140,000+", "$160,000+", "$180,000+", "$200,000+" ] - select only one
-salary = ["100,000"]
+# Salary preference - choose one label from the list in utils.salary()
+salary = ["$100,000+"]
 
-#sort - ex:["Recent"] or ["Relevent"] - select only one
+# Sort - choose one: ["Recent"] or ["Relevent"]
 sort = ["Recent"]
 
-#Blacklist companies you dont want to apply - ex: ["Apple","Google"]
+# Blacklist companies you do not want to apply to
 blacklist = ["EPAM Anywhere"]
 
-#Blaclist keywords in title - ex:["manager", ".Net"]
-blackListTitles = ["", "", ""]
+# Blacklist keywords in title
+blackListTitles = []
 
-#Only Apply these companies -  ex: ["Apple","Google"] -  leave empty for all companies
-onlyApply = [""]
+# Only apply to these companies (leave empty for all)
+onlyApply = []
 
-#Only Apply titles having these keywords -  ex:["web", "remote"] - leave empty for all companies
-onlyApplyTitles = ["programming", "remote", "Penetration Tester", "Application Security"]
+# Only apply to titles having these keywords (leave empty for all)
+onlyApplyTitles = []
 
-#Follow companies after sucessfull application True - yes, False - no
+# Follow companies after successful application: True/False
 followCompanies = False
 
-# your country code for the phone number - ex: fr
-country_code = ""
+# Your country code for the phone number - ex: 'us'
+country_code = "us"
 
 # Your phone number without identifier - ex: 123456789
 phone_number = ""

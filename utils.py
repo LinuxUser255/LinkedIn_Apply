@@ -4,22 +4,17 @@ Utilities
 import math, constants, config
 from typing import List
 import time
-from test import check_selenium_linkedin
-
-
-# taking care of the logged in status via the check_selenium_linkedin function from test.py
-def get_loggedin_status():
-    check_selenium_linkedin()
+import os
 
 
 def get_url_data_file() -> List[str]:
-    url_data = ""
+    url_data: List[str] = []
     try:
-        file = open('data/urlData.txt', 'r')
-        url_data = file.readlines()
+        with open('data/urlData.txt', 'r', encoding='utf-8') as file:
+            url_data = [line.strip() for line in file if line.strip()]
     except FileNotFoundError:
-        text = ("FileNotFound:url_data.txt file is not found. Please run ./data folder exists and check config.py "
-                "values of yours. Then run the bot again")
+        text = ("FileNotFound: data/urlData.txt file is not found. Please ensure ./data folder exists and check "
+                "config.py values. Then run the bot again")
         print(text)
     return url_data
 
@@ -47,16 +42,17 @@ def url_to_keywords(url: str) -> List[str]:
 
 
 def write_results(text: str) -> None:
+    os.makedirs('data', exist_ok=True)
     time_str = time.strftime("%Y%m%d")
     file_name = "Applied Jobs DATA - " + time_str + ".txt"
     try:
-        with open("data/" + file_name, encoding="utf-8") as file:
+        with open(os.path.join("data", file_name), 'r', encoding="utf-8") as file:
             lines = []
             for line in file:
                 if "----" not in line:
                     lines.append(line)
 
-        with open("data/" + file_name, 'w', encoding="utf-8") as f:
+        with open(os.path.join("data", file_name), 'w', encoding="utf-8") as f:
             f.write("---- Applied Jobs Data ---- created at: " + time_str + "\n")
             f.write(
                 "---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result " + "\n")
@@ -64,16 +60,25 @@ def write_results(text: str) -> None:
                 f.write(line)
             f.write(text + "\n")
 
-    except:
-        with open("data/" + file_name, 'w', encoding="utf-8") as f:
+    except FileNotFoundError:
+        with open(os.path.join("data", file_name), 'w', encoding="utf-8") as f:
             f.write("---- Applied Jobs Data ---- created at: " + time_str + "\n")
             f.write(
                 "---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result " + "\n")
-
             f.write(text + "\n")
 
 def print_info_mes(bot: str) -> None:
     print("ℹ️ " + bot + " is starting soon... ")
+
+
+def log_failed_job(link: str, reason: str = "") -> None:
+    os.makedirs('data', exist_ok=True)
+    path = os.path.join('data', 'failed_jobs.txt')
+    with open(path, 'a', encoding='utf-8') as f:
+        line = f"{link}"
+        if reason:
+            line += f" | {reason}"
+        f.write(line + "\n")
 
 
 def check_job_location(job: str) -> str:
@@ -218,23 +223,23 @@ class LinkedinUrlGenerate:
     def salary() -> str:
         salary = ""
         if config.salary[0] == "$40,000+":
-            salary = "f_SB2=1&"
+            salary = "&f_SB2=1&"
         elif config.salary[0] == "$60,000+":
-            salary = "f_SB2=2&"
+            salary = "&f_SB2=2&"
         elif config.salary[0] == "$80,000+":
-            salary = "f_SB2=3&"
+            salary = "&f_SB2=3&"
         elif config.salary[0] == "$100,000+":
-            salary = "f_SB2=4&"
+            salary = "&f_SB2=4&"
         elif config.salary[0] == "$120,000+":
-            salary = "f_SB2=5&"
+            salary = "&f_SB2=5&"
         elif config.salary[0] == "$140,000+":
-            salary = "f_SB2=6&"
+            salary = "&f_SB2=6&"
         elif config.salary[0] == "$160,000+":
-            salary = "f_SB2=7&"
+            salary = "&f_SB2=7&"
         elif config.salary[0] == "$180,000+":
-            salary = "f_SB2=8&"
+            salary = "&f_SB2=8&"
         elif config.salary[0] == "$200,000+":
-            salary = "f_SB2=9&"
+            salary = "&f_SB2=9&"
 
         return salary
 
@@ -242,9 +247,9 @@ class LinkedinUrlGenerate:
     def sort_by() -> str:
         sort_by = ""
         if config.sort[0] == "Recent":
-            sort_by = "sort_by=DD"
+            sort_by = "&sort_by=DD"
         elif config.sort[0] == "Relevent":
-            sort_by = "sort_by=R"
+            sort_by = "&sort_by=R"
         return sort_by
 
     def util_run(self):

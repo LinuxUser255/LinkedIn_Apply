@@ -156,8 +156,7 @@ class LinkedInApply:
             resume_popup_xpath = ("//button[contains(@id, 'ember') and contains(@class, 'artdeco-button--primary') and "
                                   "(contains(@aria-label, 'Next') or contains(@aria-label, 'Continue'))]")
 
-            next_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, resume_popup_xpath)))
+            next_button = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, resume_popup_xpath)))
             time.sleep(2)
             print("Attempting to click Next button on the Resume Pop-Up Box...\n")
 

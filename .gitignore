@@ -1,0 +1,31 @@
+# Local configuration
+WARP.md
+
+# IDE files
+.idea/
+
+# Chrome/Chromium binaries
+chromedriver
+chromium
+chrome
+google-chrome
+google-chrome-stable
+*.exe
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+
+# Data output
+data/
+
+# OS files
+.DS_Store
+Thumbs.db

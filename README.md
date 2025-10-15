@@ -27,120 +27,68 @@
 
 <br>
 
-# Test script:  [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)
+## Features
+Using only Chrome and Chromedriver (no Firefox):
 
-
-<br>
-
-
-## You will need to download the [Chrome Driver](https://googlechromelabs.github.io/chrome-for-testing/#stable) and palce it in the directory alongside the python files
-**https://googlechromelabs.github.io/chrome-for-testing/#stable**
-
-<br>
-
-# TO DO - Most recent: See [TODO.md](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/TODO.md)
-```
-Many of the important ones are complete.
-The next thing is integrating much of the test_apply script functionality into linkedin.py
-```
-
-**Additional items. Some completed.**
+- Ability to filter jobs by:
+  - Easy Apply, location (Worldwide, Europe, Poland, etc.), keyword (python, react, node), experience, position, job type, and date posted.
+- Apply based on your salary preference (works best for U.S. job offers).
+- Automatically apply to single-page jobs requiring just CV and contact.
+- Automatically apply to multi-page offers using saved LinkedIn info (experience, legal rights, resume, etc.).
+- Output results to data/ text files for later review.
+- Print links for jobs the bot couldn’t apply to due to extra requirements (for manual follow-up).
+- Randomized time breaks between actions to avoid thresholds.
+- Automatically runs in the background (headless mode optional).
+- Chrome-only, runs based on your preferences in config.py or .env.
+- Optional: follow or not follow company after successful application.
 
 <br>
 
-**Browser handling issues**
-- [x] Eliminate launching a new browser/login session with each iteration.
-- [x] Each URL is being visited in the same window
-- [x] Conduct all searches and applications within one browser session.
+## Tests
+There is a tests folder to verify your setup and integration:
+
+- python3 tests/setup_tests.py
+  - Outputs whether Python, pip, selenium, and dotenv are installed.
+- python3 tests/selenium_test.py
+  - Verifies Selenium can retrieve data from a website.
+- python3 tests/LinkedinTest.py
+  - Tries to log into your LinkedIn account using the CHROME_PROFILE_PATH from .env.
+  - If it errors, ensure the path exists and that you have created and logged in to your LinkedIn account once.
 
 <br>
 
-**Primary purpose of the Bot: Completion of the Easy apply section**
-- [x] Currently troubleshooting XPath click using:
-  
-## Try it here: [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py) script
-- [ ] Once the above is working, itegrate it's functionality into `linkedin.py`
-- [x] Resolve the click on "Easy apply" button: Works in `click_button_test.py`
-- [x] Implement separation of concerns for finding and clicking elements
-- [x] Create module for testing sign in
-- [x] Create a module to test login and apply
-
-- [x]  Create functionality to handle the submit apply pop-up.  
-	- [x] clicking Next (submit application) and 
-	- [x] click review
-	- [x] Modify test_apply.py to be re-run without repeating the login everytime
-
-- [ ] Integrate the four methods used to click the Easy Apply button into `linkedin.py`
-
-
-- [x] Tie it all together in `main.py`
-
-
-<br>
-
-  **Cool ideas might try: After all of the Easy apply functionality is complete.**
-- [ ] Make bot able to apply on external links
-- [ ] Make it able to register & logon to external job applications
-
-<br>
-
-  **Misc..**
-- [x] Follow PEP 8 Syle Guide coding conventions:
-- [x] Change all Variable and Function names to lower case
-- [x] Avoid account login issues
-- [x] Headless browser experience (Only the login and home page is shown. No link visitin.)
-- [x] You can change this in the `config.py` file. Where it says `headless = True`
-
-<br>
-
-**Other**
-- [x] Fix specified HTML element discovery issues
-- [x] ~~Chromium not woking properly with Linux~~
-- [x] More robustness of the bot for different fields
-- [ ] Much later, maybe add support to other major job seeking websites (Glassdoor, AngelCo, Greenhouse,
-- [ ] Possibly need? Evade Anti-Bot detection
+## Requirements
+- Chrome and matching ChromeDriver only.
+- Create a .env from .env.example and adjust values, or edit config.py directly.
+- Outputs are written to data/.
 
 <br>
 
 ## Installation and Use
 
-### Clone the repository & Install the requirments**
+### Clone the repository & install requirements
 ```shell
 git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
-
 cd LinkedIn_Apply
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 ```
-<br>
 
-## Set up scripts: virtual env and pip3
-
-### To set up a virtual enviroment
+### Run tests
 ```shell
-chmod +x virtenv_activate.sh
-./virtenv_activate.sh
+python3 tests/setup_tests.py
+python3 tests/selenium_test.py
+python3 tests/LinkedinTest.py
 ```
-<br>
 
-### Automate pip3 updates and install requirements
-
+### Run the bot
 ```shell
-chmod +x update_and_install.sh
-./update_and_install.sh
-````
+python3 main.py
+```
 
 <br>
 
-## To run the bot as of now, use: [test_apply_working_full.py](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/Test_Scripts/test_apply_working_full.py)  
-
-
-When complete use:
-
-`main.py` 
-
-**OR**
-
-`linkedin.py`.
-
-
-<br>
-
+## Notes
+- Download the [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/#stable) matching your Chrome version and make sure it’s on PATH or placed alongside the project.
+- Headless behavior can be toggled via config.headless or HEADLESS in .env.
+- See [TODO.md](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/TODO.md) for roadmap.
