@@ -4,13 +4,15 @@ WARP.md
 # IDE files
 .idea/
 
-# Chrome/Chromium binaries
+# Chrome/Chromium binaries and directories
 chromedriver
 chromium
 chrome
 google-chrome
 google-chrome-stable
 *.exe
+chrome-linux64/
+chromedriver-linux64/
 
 # Python
 __pycache__/
@@ -18,10 +20,16 @@ __pycache__/
 *$py.class
 .venv/
 venv/
+venv-linkedin-bot/
 env/
+config.py
 
-# Environment variables
+# Environment variables and credentials
 .env
+credentials.json
+credentials.env
+**/credentials.json
+**/credentials.env
 
 # Data output
 data/

@@ -64,6 +64,66 @@ There is a tests folder to verify your setup and integration:
 
 <br>
 
+## Credentials and profile setup
+
+There are two ways to provide credentials and applicant info. The recommended approach is to keep secrets outside the repo in a profile directory.
+
+1) Create and edit .env in this project
+```shell
+cp .env.example .env
+# Then open .env and set at minimum:
+# Path where Chrome will store/reuse your session (choose any directory you own)
+CHROME_PROFILE_PATH="$HOME/.config/LinkedIn_Apply_Profile"
+# Optional if your user-data-dir has multiple sub-profiles (e.g., "Default", "Profile 1")
+CHROME_PROFILE_DIR="Default"
+# Headless off for visibility (optional)
+HEADLESS=false
+# You may put credentials here, but prefer the profile credentials file below
+LINKEDIN_EMAIL=""
+LINKEDIN_PASSWORD=""
+```
+
+2) Keep secrets in your profile directory (preferred)
+- Create the directory if it does not exist and point .env to it via CHROME_PROFILE_PATH.
+- Copy the provided template and fill it in locally (do not commit secrets):
+```shell
+mkdir -p "$HOME/.config/LinkedIn_Apply_Profile"
+cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentials.json"
+```
+- Edit "$HOME/.config/LinkedIn_Apply_Profile/credentials.json" and fill the fields you need (all are optional, examples shown as empty strings or booleans):
+```json
+{
+  "LINKEDIN_EMAIL": "",
+  "LINKEDIN_PASSWORD": "",
+  "PHONE": "",
+  "RESUME_PATH": "",
+  "CITY": "",
+  "STATE": "",
+  "ZIP": "",
+  "COUNTRY": "",
+  "ADDRESS": "",
+  "PORTFOLIO_URL": "",
+  "GITHUB_URL": "",
+  "WEBSITE_URL": "",
+  "WORK_AUTH": true,
+  "SPONSORSHIP": false,
+  "RELOCATE": false,
+  "EXPECTED_SALARY": "",
+  "START_DATE": "",
+  "YEARS_EXPERIENCE": "",
+  "HEADLESS": false,
+  "CHROME_PROFILE_DIR": "Default"
+}
+```
+Notes:
+- The app loads variables in this order, with later sources overriding earlier ones:
+  1) Project .env
+  2) "$CHROME_PROFILE_PATH"/credentials.env or .env (if present)
+  3) "$CHROME_PROFILE_PATH"/credentials.json
+- If CHROME_PROFILE_PATH points to a specific sub-profile (e.g., ends with "Default" or "Profile 1"), it is auto-detected; otherwise the default sub-profile "Default" is used, or set CHROME_PROFILE_DIR explicitly.
+- Ensure RESUME_PATH points to an existing file if you want automatic resume upload.
+- Do not commit secrets. Keep them only in your profile directory.
+
 ## Installation and Use
 
 ### Clone the repository & install requirements

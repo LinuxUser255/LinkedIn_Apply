@@ -19,7 +19,7 @@ LinkedinBotProPassword = ""
 location = ["United States"]
 
 # Keywords related to your job search
-keywords = ["python"]
+keywords = ["Penetration Tester", "Web App Penetration Tester", "API Security", "Cybersecurity"  ]
 
 # Job experience Levels - e.g.: ["Internship", "Entry level", "Associate", "Mid-Senior level", "Director", "Executive"]
 experienceLevels = ["Entry level", "Mid-Senior level"]
@@ -40,7 +40,7 @@ salary = ["$100,000+"]
 sort = ["Recent"]
 
 # Blacklist companies you do not want to apply to
-blacklist = ["EPAM Anywhere"]
+blacklist = [""]
 
 # Blacklist keywords in title
 blackListTitles = []
@@ -49,7 +49,7 @@ blackListTitles = []
 onlyApply = []
 
 # Only apply to titles having these keywords (leave empty for all)
-onlyApplyTitles = []
+onlyApplyTitles = ["Penetration Test", "Web App Penetration Tester", "API Security", "Cybersecurity"]
 
 # Follow companies after successful application: True/False
 followCompanies = False

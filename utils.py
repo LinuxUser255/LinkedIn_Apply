@@ -19,17 +19,34 @@ def get_url_data_file() -> List[str]:
     return url_data
 
 def jobs_to_pages(num_of_jobs: str) -> int:
-    number_of_pages = 1
+    """
+    Convert a LinkedIn job count string to number of pages.
+    Handles formats like:
+    - "1,234 results"
+    - "100+ results"
+    - "100+"
+    - "25"
+    Returns 0 when no numeric value is found.
+    Caps pages at 40.
+    """
+    import re
 
-    if ' ' in num_of_jobs:
-        space_index = num_of_jobs.index(' ')
-        total_jobs = (num_of_jobs[0:space_index])
-        total_jobs_int = int(total_jobs.replace(',', ''))
-        number_of_pages = math.ceil(total_jobs_int / constants.jobsPerPage)
-        if (number_of_pages > 40): number_of_pages = 40
+    text = (num_of_jobs or '').strip()
+    if not text:
+        return 0
 
-    else:
-        number_of_pages = int(num_of_jobs)
+    m = re.search(r'(\d[\d,]*)', text)
+    if not m:
+        return 0
+
+    try:
+        total_jobs_int = int(m.group(1).replace(',', ''))
+    except Exception:
+        return 0
+
+    number_of_pages = max(1, math.ceil(total_jobs_int / constants.jobsPerPage))
+    if number_of_pages > 40:
+        number_of_pages = 40
 
     return number_of_pages
 
@@ -67,6 +84,7 @@ def write_results(text: str) -> None:
                 "---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result " + "\n")
             f.write(text + "\n")
 
+
 def print_info_mes(bot: str) -> None:
     print("ℹ️ " + bot + " is starting soon... ")
 
@@ -79,6 +97,16 @@ def log_failed_job(link: str, reason: str = "") -> None:
         if reason:
             line += f" | {reason}"
         f.write(line + "\n")
+
+
+def append_url_for_manual_apply(link: str) -> None:
+    """Append a job URL to data/urlData.txt for manual follow-up if Easy Apply is unavailable."""
+    try:
+        os.makedirs('data', exist_ok=True)
+        with open(os.path.join('data', 'urlData.txt'), 'a', encoding='utf-8') as f:
+            f.write(link + "\n")
+    except Exception:
+        pass
 
 
 def check_job_location(job: str) -> str:
