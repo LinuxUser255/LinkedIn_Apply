@@ -8,7 +8,7 @@
 
 **Built with**
 
-![PythonLogo](https://github.com/user-attachments/assets/4c25054e-c5b1-4577-b1cc-35930bc6cae6)    
+![PythonLogo](https://github.com/user-attachments/assets/4c25054e-c5b1-4577-b1cc-35930bc6cae6)
 ![SeleniumLoge](https://github.com/user-attachments/assets/cef6469b-8193-41ac-b663-992b2a788c0a)
 
 **[Selenium docs](https://selenium-python.readthedocs.io/)**
@@ -134,14 +134,14 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Run tests
+### Run tests (optional)
 ```shell
 python3 tests/setup_tests.py
 python3 tests/selenium_test.py
 python3 tests/LinkedinTest.py
 ```
 
-### Run the bot
+### RUN THE BOT
 ```shell
 python3 main.py
 ```
