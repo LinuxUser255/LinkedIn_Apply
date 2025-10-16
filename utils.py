@@ -324,8 +324,8 @@ class LinkedinUrlGenerate:
         return sort_by
 
     def util_run(self):
-        # Your main function code goes here
-        # For example, you can call the LinkedinUrlGenerate class and its methods
+        # main function code goes here
+        # example, you can call the LinkedinUrlGenerate class and its methods
         url_generator = LinkedinUrlGenerate()
         urls = url_generator.generate_url_links()
         for url in urls:
