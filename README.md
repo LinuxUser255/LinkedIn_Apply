@@ -1,10 +1,8 @@
-
+<div align="center">
 
 # LinkedIn Job Application Bot
 
-
 ![linkedin-logo-02](https://github.com/user-attachments/assets/8829660c-8021-49a2-951f-241ea62394e4)
-
 
 **Built with**
 
@@ -13,9 +11,7 @@
 
 **[Selenium docs](https://selenium-python.readthedocs.io/)**
 
-
-
-<br>
+</div>
 
 
 
@@ -36,7 +32,7 @@ Using only Chrome and Chromedriver (no Firefox):
 - Automatically apply to single-page jobs requiring just CV and contact.
 - Automatically apply to multi-page offers using saved LinkedIn info (experience, legal rights, resume, etc.).
 - Output results to data/ text files for later review.
-- Print links for jobs the bot couldn’t apply to due to extra requirements (for manual follow-up).
+- Print links for jobs the bot couldn't apply to due to extra requirements (for manual follow-up).
 - Randomized time breaks between actions to avoid thresholds.
 - Automatically runs in the background (headless mode optional).
 - Chrome-only, runs based on your preferences in config.py or .env.
@@ -90,7 +86,9 @@ LINKEDIN_PASSWORD=""
 mkdir -p "$HOME/.config/LinkedIn_Apply_Profile"
 cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentials.json"
 ```
+
 - Edit "$HOME/.config/LinkedIn_Apply_Profile/credentials.json" and fill the fields you need (all are optional, examples shown as empty strings or booleans):
+
 ```json
 {
   "LINKEDIN_EMAIL": "",
@@ -115,6 +113,7 @@ cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentia
   "CHROME_PROFILE_DIR": "Default"
 }
 ```
+
 Notes:
 - The app loads variables in this order, with later sources overriding earlier ones:
   1) Project .env
@@ -123,6 +122,8 @@ Notes:
 - If CHROME_PROFILE_PATH points to a specific sub-profile (e.g., ends with "Default" or "Profile 1"), it is auto-detected; otherwise the default sub-profile "Default" is used, or set CHROME_PROFILE_DIR explicitly.
 - Ensure RESUME_PATH points to an existing file if you want automatic resume upload.
 - Do not commit secrets. Keep them only in your profile directory.
+
+<br>
 
 ## Installation and Use
 
@@ -149,6 +150,48 @@ python3 main.py
 <br>
 
 ## Notes
-- Download the [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/#stable) matching your Chrome version and make sure it’s on PATH or placed alongside the project.
+- Download the [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/#stable) matching your Chrome version and make sure it's on PATH or placed alongside the project.
 - Headless behavior can be toggled via config.headless or HEADLESS in .env.
 - See [TODO.md](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/TODO.md) for roadmap.
+
+<br>
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+### Development Workflow
+1. Fork the repository
+2. Clone your fork:
+   ```shell
+   git clone https://github.com/YOUR_USERNAME/LinkedIn_Apply.git
+   cd LinkedIn_Apply
+   ```
+3. Create a new branch from `dev` for your feature:
+   ```shell
+   git checkout dev
+   git pull origin dev
+   git checkout -b feature/your-feature-name
+   ```
+4. Make your changes and test thoroughly
+5. Commit with clear, descriptive messages:
+   ```shell
+   git add .
+   git commit -m "Add feature: description"
+   ```
+6. Push to your fork:
+   ```shell
+   git push origin feature/your-feature-name
+   ```
+7. Open a Pull Request against the `dev` branch (not `main`)
+
+### Guidelines
+- All PRs should target the `dev` branch
+- The `main` branch is for stable releases only
+- Follow existing code style and conventions
+- Test your changes before submitting
+- Update documentation if needed
+- Do not commit credentials, secrets, or personal information
+
+### Questions or Issues?
+Feel free to open an issue for bugs, feature requests, or questions.
