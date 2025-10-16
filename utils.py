@@ -109,6 +109,49 @@ def append_url_for_manual_apply(link: str) -> None:
         pass
 
 
+def get_applied_jobs() -> set:
+    """Load set of already-applied job URLs from data files."""
+    applied = set()
+    try:
+        os.makedirs('data', exist_ok=True)
+        # Check all applied jobs data files
+        for fname in os.listdir('data'):
+            if fname.startswith('Applied Jobs DATA'):
+                fpath = os.path.join('data', fname)
+                try:
+                    with open(fpath, 'r', encoding='utf-8') as f:
+                        for line in f:
+                            if 'linkedin.com/jobs/view/' in line:
+                                # Extract job ID from the line
+                                import re
+                                match = re.search(r'linkedin\.com/jobs/view/(\d+)', line)
+                                if match:
+                                    applied.add(match.group(1))
+                except Exception:
+                    continue
+        # Also check failed_jobs.txt
+        failed_path = os.path.join('data', 'failed_jobs.txt')
+        if os.path.isfile(failed_path):
+            try:
+                with open(failed_path, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        if 'linkedin.com/jobs/view/' in line:
+                            import re
+                            match = re.search(r'linkedin\.com/jobs/view/(\d+)', line)
+                            if match:
+                                applied.add(match.group(1))
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return applied
+
+
+def is_job_already_applied(job_id: str, applied_set: set) -> bool:
+    """Check if a job ID has already been applied to."""
+    return str(job_id) in applied_set
+
+
 def check_job_location(job: str) -> str:
     job_loc = "&location=" + job
     if job.casefold() == "asia":

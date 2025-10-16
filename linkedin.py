@@ -215,6 +215,8 @@ class LinkedIn:
     def link_job_apply(self) -> None:
         count_applied = 0
         count_jobs = 0
+        count_skipped = 0
+        count_saved = 0
         self.pause_file = 'data/pause_bot.txt'
 
         url_data = utils.get_url_data_file()
@@ -225,7 +227,12 @@ class LinkedIn:
             print('No URLs to process.')
             return
 
-        print("\n[INFO] Bot started. To pause, create file: data/pause_bot.txt")
+        # Load already-applied jobs
+        print("\n[INFO] Loading previously applied jobs...")
+        applied_jobs = utils.get_applied_jobs()
+        print(f"[INFO] Found {len(applied_jobs)} previously applied/attempted jobs.\n")
+
+        print("[INFO] Bot started. To pause, create file: data/pause_bot.txt")
         print("[INFO] To resume, delete the pause file.\n")
 
         for base_url in url_data:
@@ -268,6 +275,12 @@ class LinkedIn:
                         continue
 
                 for job_id in offer_ids:
+                    # Skip if already applied
+                    if utils.is_job_already_applied(str(job_id), applied_jobs):
+                        count_skipped += 1
+                        print(f"[SKIP] Already applied to job {job_id}, skipping...")
+                        continue
+
                     offer_page = f'https://www.linkedin.com/jobs/view/{job_id}'
                     self.driver.get(offer_page)
                     time.sleep(random.uniform(5, constants.botSpeed))
@@ -294,22 +307,36 @@ class LinkedIn:
                             else:
                                 # Multi-step flow
                                 result = self.apply_process_multi_step(offer_page)
+                                if "Just Applied" in result:
+                                    count_applied += 1
+                                elif "Couldn't apply" in result:
+                                    # Save for later and move on
+                                    if self.save_job_for_later():
+                                        count_saved += 1
+                                        result += " (Saved for later)"
                                 line_to_write = job_properties + " | " + result
                                 self.display_write_results(line_to_write)
-                        except Exception:
+                        except Exception as e:
                             utils.log_failed_job(offer_page, 'Submit flow failed')
+                            # Try to save for later
+                            if self.save_job_for_later():
+                                count_saved += 1
+                                print(f"[SAVE] Saved job {job_id} for later review")
                     else:
                         line_to_write = job_properties + " | " + "* Cannot apply (no Easy Apply). Job: " + str(offer_page)
                         self.display_write_results(line_to_write)
                         utils.log_failed_job(offer_page, 'No Easy Apply')
                         try:
                             utils.append_url_for_manual_apply(offer_page)
+                            # Also try to save for later
+                            if self.save_job_for_later():
+                                count_saved += 1
                         except Exception:
                             pass
 
             print(
-                "Category: " + url_words[0] + "," + url_words[1] + " applied: " + str(count_applied) +
-                " jobs out of " + str(count_jobs) + "."
+                f"Category: {url_words[0]}, {url_words[1]} | Applied: {count_applied} | "
+                f"Skipped: {count_skipped} | Saved: {count_saved} | Total processed: {count_jobs}"
             )
 
     def try_submit_single_page(self) -> bool:
@@ -343,6 +370,59 @@ class LinkedIn:
             f"{count} | {job_title} | {job_company} | {job_location} | {job_work_place} | {job_posted_date} | {job_applications}"
         )
         return text_to_write
+
+    def save_job_for_later(self) -> bool:
+        """Click the Save button to save job for later review."""
+        # First, close any open Easy Apply dialogs
+        try:
+            close_selectors = [
+                (By.CSS_SELECTOR, "button[aria-label='Dismiss']"),
+                (By.CSS_SELECTOR, "button[data-test-modal-close-btn]"),
+                (By.XPATH, "//button[@aria-label='Dismiss']"),
+                (By.XPATH, "//button[contains(@class,'artdeco-modal__dismiss')]"),
+            ]
+            for by, sel in close_selectors:
+                try:
+                    close_btn = self.driver.find_element(by, sel)
+                    if close_btn.is_displayed():
+                        close_btn.click()
+                        time.sleep(1)
+                        break
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        
+        save_selectors = [
+            (By.CSS_SELECTOR, "button.jobs-save-button"),
+            (By.CSS_SELECTOR, "button[aria-label*='Save']"),
+            (By.XPATH, "//button[contains(@class,'jobs-save-button')]"),
+            (By.XPATH, "//button[.//span[contains(text(),'Save')]]"),
+        ]
+        
+        for by, sel in save_selectors:
+            try:
+                save_btn = WebDriverWait(self.driver, 3).until(
+                    EC.presence_of_element_located((by, sel))
+                )
+                if save_btn.is_displayed() and save_btn.is_enabled():
+                    # Check if already saved
+                    label = save_btn.get_attribute('aria-label') or ''
+                    if 'unsave' in label.lower() or 'saved' in label.lower():
+                        print("[INFO] Job already saved, skipping save action")
+                        return True
+                    # Click save
+                    self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", save_btn)
+                    time.sleep(0.5)
+                    try:
+                        save_btn.click()
+                    except Exception:
+                        self.driver.execute_script('arguments[0].click();', save_btn)
+                    time.sleep(1)
+                    return True
+            except Exception:
+                continue
+        return False
 
     def find_easy_apply_button(self) -> Optional[object]:
         # Give the page a moment
