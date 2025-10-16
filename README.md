@@ -1,8 +1,6 @@
-
+<div align="center">
 
 # LinkedIn Job Application Bot
-
-<div align="center">
 
 ![linkedin-logo-02](https://github.com/user-attachments/assets/8829660c-8021-49a2-951f-241ea62394e4)
 
@@ -14,10 +12,6 @@
 **[Selenium docs](https://selenium-python.readthedocs.io/)**
 
 </div>
-
-
-
-<br>
 
 
 
@@ -38,7 +32,7 @@ Using only Chrome and Chromedriver (no Firefox):
 - Automatically apply to single-page jobs requiring just CV and contact.
 - Automatically apply to multi-page offers using saved LinkedIn info (experience, legal rights, resume, etc.).
 - Output results to data/ text files for later review.
-- Print links for jobs the bot couldn’t apply to due to extra requirements (for manual follow-up).
+- Print links for jobs the bot couldn't apply to due to extra requirements (for manual follow-up).
 - Randomized time breaks between actions to avoid thresholds.
 - Automatically runs in the background (headless mode optional).
 - Chrome-only, runs based on your preferences in config.py or .env.
@@ -92,7 +86,9 @@ LINKEDIN_PASSWORD=""
 mkdir -p "$HOME/.config/LinkedIn_Apply_Profile"
 cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentials.json"
 ```
+
 - Edit "$HOME/.config/LinkedIn_Apply_Profile/credentials.json" and fill the fields you need (all are optional, examples shown as empty strings or booleans):
+
 ```json
 {
   "LINKEDIN_EMAIL": "",
@@ -117,6 +113,7 @@ cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentia
   "CHROME_PROFILE_DIR": "Default"
 }
 ```
+
 Notes:
 - The app loads variables in this order, with later sources overriding earlier ones:
   1) Project .env
@@ -125,6 +122,8 @@ Notes:
 - If CHROME_PROFILE_PATH points to a specific sub-profile (e.g., ends with "Default" or "Profile 1"), it is auto-detected; otherwise the default sub-profile "Default" is used, or set CHROME_PROFILE_DIR explicitly.
 - Ensure RESUME_PATH points to an existing file if you want automatic resume upload.
 - Do not commit secrets. Keep them only in your profile directory.
+
+<br>
 
 ## Installation and Use
 
