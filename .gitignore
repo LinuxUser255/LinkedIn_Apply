@@ -1,8 +1,8 @@
 # Local configuration
-WARP.md
 
 # IDE files
 .idea/
+.misc/
 
 # Chrome/Chromium binaries and directories
 chromedriver
