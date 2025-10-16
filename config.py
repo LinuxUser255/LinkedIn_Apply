@@ -40,7 +40,7 @@ salary = ["$100,000+"]
 sort = ["Recent"]
 
 # Blacklist companies you do not want to apply to
-blacklist = [""]
+blacklist = ["NetSpi"]
 
 # Blacklist keywords in title
 blackListTitles = []
