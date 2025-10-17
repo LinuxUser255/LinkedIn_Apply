@@ -17,8 +17,6 @@
 
 ## A Python bot that will apply to the, "Easy Apply", jobs based on your preferences.
 
-- I may be adding Ollama at some point in the future.
-
 - This repo/codebase is a work in progress, & is intended to be an updated version of [my other linkedin bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
 <br>
@@ -40,55 +38,83 @@ Using only Chrome and Chromedriver (no Firefox):
 
 <br>
 
-## Tests
-There is a tests folder to verify your setup and integration:
+ <a href="https://buymeacoffee.com/chrisbingh8" target="_blank">
+   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px; width: 217px;">
+   <br>
+   <span style="color: #FF0000; font-weight: bold; font-size: 26pt;">&nbsp;&nbsp;Support My Work :)</span>
 
-- python3 tests/setup_tests.py
+ </a>
+ <br><br>
+
+
+
+## Tests
+**There is a tests folder to verify your setup and integration:**
+
+- `python3 tests/setup_tests.py`
   - Outputs whether Python, pip, selenium, and dotenv are installed.
-- python3 tests/selenium_test.py
+- `python3 tests/selenium_test.py`
   - Verifies Selenium can retrieve data from a website.
-- python3 tests/LinkedinTest.py
-  - Tries to log into your LinkedIn account using the CHROME_PROFILE_PATH from .env.
+- `python3 tests/LinkedinTest.py`
+  - Tries to log into your LinkedIn account using the `CHROME_PROFILE_PATH` from `.env`.
   - If it errors, ensure the path exists and that you have created and logged in to your LinkedIn account once.
 
 <br>
 
 ## Requirements
-- Chrome and matching ChromeDriver only.
-- Create a .env from .env.example and adjust values, or edit config.py directly.
-- Outputs are written to data/.
+- [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/#stable) 
+- Create a `.env` from `.env.example` and adjust values, or edit config.py directly.
+- Outputs are written to `data/`.
 
 <br>
 
-## Credentials and profile setup
+## Setup instructions:
+### Credentials and profile
 
-There are two ways to provide credentials and applicant info. The recommended approach is to keep secrets outside the repo in a profile directory.
+There are two ways to provide credentials and applicant info. 
 
-1) Create and edit .env in this project
+The recommended approach is to keep secrets outside the repo in a profile directory.
+
+#### 1) Create and edit `.env` in this project
 ```shell
 cp .env.example .env
+
 # Then open .env and set at minimum:
 # Path where Chrome will store/reuse your session (choose any directory you own)
 CHROME_PROFILE_PATH="$HOME/.config/LinkedIn_Apply_Profile"
+
 # Optional if your user-data-dir has multiple sub-profiles (e.g., "Default", "Profile 1")
 CHROME_PROFILE_DIR="Default"
+
 # Headless off for visibility (optional)
 HEADLESS=false
+
 # You may put credentials here, but prefer the profile credentials file below
 LINKEDIN_EMAIL=""
 LINKEDIN_PASSWORD=""
 ```
 
-2) Keep secrets in your profile directory (preferred)
-- Create the directory if it does not exist and point .env to it via CHROME_PROFILE_PATH.
-- Copy the provided template and fill it in locally (do not commit secrets):
+<br>
+
+
+#### 2) Preferred: Create secrets in your profile directory 
+- Make the directory if it does not exist and point .env to it via `CHROME_PROFILE_PATH`.
+- Copy the provided template and fill it in locally _(do not commit secrets):_
 ```shell
 mkdir -p "$HOME/.config/LinkedIn_Apply_Profile"
 cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentials.json"
 ```
 
-- Edit "$HOME/.config/LinkedIn_Apply_Profile/credentials.json" and fill the fields you need (all are optional, examples shown as empty strings or booleans):
+<br>
 
+
+- Make sure you succesfully created your config  -> `"$HOME/.config/LinikedIN_Apply_Profile/credentials.json`
+- This is how, and from where your credentials and job search settings are sourced.
+- Edit `"$HOME/.config/LinkedIn_Apply_Profile/credentials.json"` and fill the fields you need (all are optional, examples shown as empty strings or booleans):
+- Optionally, you could code them into  `config.py`. Warning, doing so may make it easier to unintentionally share your creds
+
+
+ **credentials.json**
 ```json
 {
   "LINKEDIN_EMAIL": "",
@@ -114,14 +140,18 @@ cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentia
 }
 ```
 
-Notes:
+<br>
+
+**Notes:**
+---
 - The app loads variables in this order, with later sources overriding earlier ones:
-  1) Project .env
-  2) "$CHROME_PROFILE_PATH"/credentials.env or .env (if present)
-  3) "$CHROME_PROFILE_PATH"/credentials.json
-- If CHROME_PROFILE_PATH points to a specific sub-profile (e.g., ends with "Default" or "Profile 1"), it is auto-detected; otherwise the default sub-profile "Default" is used, or set CHROME_PROFILE_DIR explicitly.
-- Ensure RESUME_PATH points to an existing file if you want automatic resume upload.
-- Do not commit secrets. Keep them only in your profile directory.
+ 1) Project `.env`
+ 2) `"$CHROME_PROFILE_PATH"/credentials.env` or `.env` (if present)
+ 3) `"$CHROME_PROFILE_PATH"/credentials.json`
+- If `CHROME_PROFILE_PATH` points to a specific sub-profile _(e.g., ends with "Default" or "Profile 1")_, 
+- it is auto-detected; otherwise the default sub-profile "Default" is used, or set `CHROME_PROFILE_DIR` explicitly.
+- Ensure `RESUME_PATH` points to an existing file if you want automatic resume upload.
+- **Do not commit secrets. Keep them only in your profile directory.**
 
 <br>
 
@@ -150,9 +180,8 @@ python3 main.py
 <br>
 
 ## Notes
-- Download the [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/#stable) matching your Chrome version and make sure it's on PATH or placed alongside the project.
+- Download the [ChromeDriver](https://googlechromelabs.github.io/chrome-for-testing/#stable) matching your Chrome version and place it in the root the of the project.
 - Headless behavior can be toggled via config.headless or HEADLESS in .env.
-- See [TODO.md](https://github.com/LinuxUser255/LinkedIn_Apply/blob/main/TODO.md) for roadmap.
 
 <br>
 
@@ -161,29 +190,36 @@ python3 main.py
 Contributions are welcome! Please follow these guidelines:
 
 ### Development Workflow
-1. Fork the repository
-2. Clone your fork:
+**1. Fork the repository**
+
    ```shell
    git clone https://github.com/YOUR_USERNAME/LinkedIn_Apply.git
    cd LinkedIn_Apply
    ```
-3. Create a new branch from `dev` for your feature:
+<br>
+
+**2. Create a new branch from `dev` for your feature:**
    ```shell
    git checkout dev
    git pull origin dev
    git checkout -b feature/your-feature-name
    ```
-4. Make your changes and test thoroughly
-5. Commit with clear, descriptive messages:
+<br>
+
+**4. Make your changes and test thoroughly & Commit with clear, descriptive messages:**
    ```shell
    git add .
    git commit -m "Add feature: description"
    ```
-6. Push to your fork:
+<br>
+
+**5. Push to your fork:**
    ```shell
    git push origin feature/your-feature-name
    ```
-7. Open a Pull Request against the `dev` branch (not `main`)
+<br>
+
+**6. Open a Pull Request against the `dev` branch (not `main`)**
 
 ### Guidelines
 - All PRs should target the `dev` branch
@@ -195,3 +231,5 @@ Contributions are welcome! Please follow these guidelines:
 
 ### Questions or Issues?
 Feel free to open an issue for bugs, feature requests, or questions.
+
+<br>
