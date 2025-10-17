@@ -299,6 +299,26 @@ class LinkedIn:
                                 utils.log_failed_job(offer_page, 'Easy Apply button not clickable')
                                 continue
                         time.sleep(random.uniform(5, constants.botSpeed))
+                        
+                        # Check if daily limit message appears after clicking
+                        if self.check_daily_limit_reached():
+                            error_msg = ("\n" + "="*80 + "\n" +
+                                        "[ERROR] DAILY LIMIT REACHED!\n" +
+                                        "You've reached today's Easy Apply limit.\n" +
+                                        "Great effort applying today. LinkedIn limits daily submissions\n" +
+                                        "to help ensure each application gets the right attention.\n" +
+                                        "Save jobs and continue applying tomorrow.\n" +
+                                        "="*80 + "\n")
+                            print(error_msg)
+                            line_to_write = job_properties + " | " + "* DAILY LIMIT REACHED - Cannot apply further today"
+                            self.display_write_results(line_to_write)
+                            utils.log_failed_job(offer_page, 'Daily limit reached')
+                            # Save the job for later
+                            if self.save_job_for_later():
+                                count_saved += 1
+                                print(f"[SAVE] Saved job {job_id} to apply tomorrow")
+                            print("\n[INFO] Stopping bot due to daily limit. Please try again tomorrow.")
+                            return
                         try:
                             if self.try_submit_single_page():
                                 count_applied += 1
@@ -322,7 +342,28 @@ class LinkedIn:
                             if self.save_job_for_later():
                                 count_saved += 1
                                 print(f"[SAVE] Saved job {job_id} for later review")
-                    else:
+                    else: # If you reach the max ammount of attempts, this is were it stops.
+                        # Check if daily limit is reached
+                        if self.check_daily_limit_reached():
+                            error_msg = ("\n" + "="*80 + "\n" +
+                                        "[ERROR] DAILY LIMIT REACHED!\n" +
+                                        "You've reached today's Easy Apply limit.\n" +
+                                        "Great effort applying today. LinkedIn limits daily submissions\n" +
+                                        "to help ensure each application gets the right attention.\n" +
+                                        "Save this job and continue applying tomorrow.\n" +
+                                        "="*80 + "\n")
+                            print(error_msg)
+                            line_to_write = job_properties + " | " + "* DAILY LIMIT REACHED - Cannot apply further today"
+                            self.display_write_results(line_to_write)
+                            utils.log_failed_job(offer_page, 'Daily limit reached')
+                            # Save the job for later and exit
+                            if self.save_job_for_later():
+                                count_saved += 1
+                                print(f"[SAVE] Saved job {job_id} to apply tomorrow")
+                            # Exit the entire application process
+                            print("\n[INFO] Stopping bot due to daily limit. Please try again tomorrow.")
+                            return
+                        
                         line_to_write = job_properties + " | " + "* Cannot apply (no Easy Apply). Job: " + str(offer_page)
                         self.display_write_results(line_to_write)
                         utils.log_failed_job(offer_page, 'No Easy Apply')
@@ -480,6 +521,48 @@ class LinkedIn:
 
         print("[DEBUG] No Easy Apply button found on this job")
         return None
+
+    def check_daily_limit_reached(self) -> bool:
+        """Check if the daily Easy Apply limit has been reached."""
+        try:
+            # Check for the daily limit message on the page
+            limit_messages = [
+                "You've reached today's Easy Apply limit",
+                "reached today's Easy Apply limit",
+                "daily submissions to help ensure",
+                "continue applying tomorrow"
+            ]
+            
+            # Check various elements where the message might appear
+            elements_to_check = self.driver.find_elements(By.XPATH, "//div | //span | //p | //h2 | //h3")
+            
+            for element in elements_to_check:
+                try:
+                    text = element.text
+                    if text:
+                        for limit_msg in limit_messages:
+                            if limit_msg in text:
+                                print(f"[DEBUG] Daily limit message detected: {text[:100]}...")
+                                return True
+                except Exception:
+                    continue
+            
+            # Also check if there's a modal or alert with the limit message
+            try:
+                modal = self.driver.find_element(By.CSS_SELECTOR, "div[role='dialog'], div[role='alert']")
+                if modal:
+                    modal_text = modal.text
+                    for limit_msg in limit_messages:
+                        if limit_msg in modal_text:
+                            print(f"[DEBUG] Daily limit detected in modal: {modal_text[:100]}...")
+                            return True
+            except Exception:
+                pass
+                
+        except Exception as e:
+            print(f"[DEBUG] Error checking daily limit: {str(e)}")
+            
+        return False
 
     def _env(self, key: str, default: str = "") -> str:
         return os.getenv(key, default).strip()
