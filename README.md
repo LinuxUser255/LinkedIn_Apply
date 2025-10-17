@@ -1,3 +1,4 @@
+
 <div align="center">
 
 # LinkedIn Job Application Bot
@@ -21,6 +22,38 @@
 
 <br>
 
+## Table of Contents
+- [Features](#features)
+- [Tests](#tests)
+- [Requirements](#requirements)
+- [Setup Instructions](#setup-instructions)
+  - [Credentials and Profile](#credentials-and-profile)
+    - [1) Create and edit `.env` in this project](#1-create-and-edit-env-in-this-project)
+    - [2) Preferred: Create secrets in your profile directory](#2-preferred-create-secrets-in-your-profile-directory)
+  - [Notes](#notes)
+- [Installation and Use](#installation-and-use)
+  - [Clone the repository & install requirements](#clone-the-repository--install-requirements)
+  - [Run tests (optional)](#run-tests-optional)
+  - [RUN THE BOT](#run-the-bot)
+- [Notes](#notes-1)
+- [Contributing](#contributing)
+  - [Development Workflow](#development-workflow)
+  - [Guidelines](#guidelines)
+  - [Questions or Issues?](#questions-or-issues)
+
+<br>
+
+
+#### Support My Work
+<div align="left">
+  <h2 style="color: white; font-weight: bold; margin-bottom: 10px;">Support My Work</h2>
+  <a href="https://buymeacoffee.com/chrisbingh8" target="_blank">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 50px;">
+  </a>
+</div>
+
+
+
 ## Features
 Using only Chrome and Chromedriver (no Firefox):
 
@@ -37,16 +70,6 @@ Using only Chrome and Chromedriver (no Firefox):
 - Optional: follow or not follow company after successful application.
 
 <br>
-
- <a href="https://buymeacoffee.com/chrisbingh8" target="_blank">
-   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px; width: 217px;">
-   <br>
-   <span style="color: #FF0000; font-weight: bold; font-size: 26pt;">&nbsp;&nbsp;Support My Work :)</span>
-
- </a>
- <br><br>
-
-
 
 ## Tests
 **There is a tests folder to verify your setup and integration:**
@@ -68,8 +91,8 @@ Using only Chrome and Chromedriver (no Firefox):
 
 <br>
 
-## Setup instructions:
-### Credentials and profile
+## Setup Instructions
+### Credentials and Profile
 
 There are two ways to provide credentials and applicant info. 
 
