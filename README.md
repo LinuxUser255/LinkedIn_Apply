@@ -44,9 +44,8 @@
 <br>
 
 
-#### Support My Work
+
 <div align="left">
-  <h2 style="color: white; font-weight: bold; margin-bottom: 10px;">Support My Work</h2>
   <a href="https://buymeacoffee.com/chrisbingh8" target="_blank">
     <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 50px;">
   </a>

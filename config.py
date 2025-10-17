@@ -18,8 +18,8 @@ LinkedinBotProPassword = ""
 # Continent shortcuts: ["Europe", "Asia", "Australia", "NorthAmerica", "SouthAmerica", "Africa"]
 location = ["United States"]
 
-# Keywords related to your job search
-keywords = ["Penetration Tester", "Web App Penetration Tester", "API Security", "Cybersecurity", "BurpSuite", "Linux", "Mobile App Security", "Network Security", "Operating System Security"]
+# Keywords related to your job search, edit according to what you are seeking
+keywords = ["Cybersecurity", "Linux"]
 
 # Job experience Levels - e.g.: ["Internship", "Entry level", "Associate", "Mid-Senior level", "Director", "Executive"]
 experienceLevels = ["Entry level", "Mid-Senior level"]
@@ -43,16 +43,16 @@ salary = ["$100,000+"]
 sort = ["Recent"]
 
 # Blacklist companies you do not want to apply to
-blacklist = ["NetSpi"]
+blacklist = [""]
 
 # Blacklist keywords in title
-blackListTitles = []
+blackListTitles = [""]
 
 # Only apply to these companies (leave empty for all)
-onlyApply = []
+onlyApply = [""]
 
 # Only apply to titles having these keywords (leave empty for all)
-onlyApplyTitles = ["Penetration Tester", "Web App Penetration Tester", "API Security", "Cybersecurity"]
+onlyApplyTitles = ["Penetration Tester", "Cybersecurity"]
 
 # Follow companies after successful application: True/False
 followCompanies = False
