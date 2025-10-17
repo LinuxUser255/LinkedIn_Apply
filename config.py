@@ -19,10 +19,13 @@ LinkedinBotProPassword = ""
 location = ["United States"]
 
 # Keywords related to your job search
-keywords = ["Penetration Tester", "Web App Penetration Tester", "API Security", "Cybersecurity"  ]
+keywords = ["Penetration Tester", "Web App Penetration Tester", "API Security", "Cybersecurity", "BurpSuite", "Linux", "Mobile App Security", "Network Security", "Operating System Security"]
 
 # Job experience Levels - e.g.: ["Internship", "Entry level", "Associate", "Mid-Senior level", "Director", "Executive"]
 experienceLevels = ["Entry level", "Mid-Senior level"]
+
+# Years of experience - e.g.: ["1-3 years", "3-5 years", "5+ years"]
+yearsOfExperience = ["5+ years"]
 
 # Date posted - choose one: ["Any Time", "Past Month", "Past Week", "Past 24 hours"]
 datePosted = ["Any Time"]
@@ -31,7 +34,7 @@ datePosted = ["Any Time"]
 jobType = ["Full-time", "Contract"]
 
 # Workplace type(s): ["On-site", "Remote", "Hybrid"]
-remote = ["Remote", "Hybrid"]
+remote = ["Remote"]
 
 # Salary preference - choose one label from the list in utils.salary()
 salary = ["$100,000+"]
@@ -40,7 +43,7 @@ salary = ["$100,000+"]
 sort = ["Recent"]
 
 # Blacklist companies you do not want to apply to
-blacklist = [""]
+blacklist = ["NetSpi"]
 
 # Blacklist keywords in title
 blackListTitles = []
@@ -49,7 +52,7 @@ blackListTitles = []
 onlyApply = []
 
 # Only apply to titles having these keywords (leave empty for all)
-onlyApplyTitles = ["Penetration Test", "Web App Penetration Tester", "API Security", "Cybersecurity"]
+onlyApplyTitles = ["Penetration Tester", "Web App Penetration Tester", "API Security", "Cybersecurity"]
 
 # Follow companies after successful application: True/False
 followCompanies = False
