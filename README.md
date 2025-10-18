@@ -15,10 +15,13 @@
 </div>
 
 
-
 ## A Python bot that will apply to the, "Easy Apply", jobs based on your preferences.
 
-- This repo/codebase is a work in progress, & is intended to be an updated version of [my other linkedin bot](https://github.com/LinuxUser255/linkedin-application-bot)
+<br>
+
+![bot-works-apply-to.png](images/bot-works-apply-to.png)
+
+- This Bot is based on my earlier [LinkedIn Bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
 <br>
 
