@@ -212,6 +212,37 @@ class LinkedIn:
             print("Couldn't generate URLs. Ensure ./data exists and config.py preferences are set.")
             print(str(e))
 
+    def _progress_path(self) -> str:
+        return os.path.join('data', 'progress.json')
+
+    def _load_progress(self) -> dict:
+        try:
+            with open(self._progress_path(), 'r', encoding='utf-8') as f:
+                return json.load(f) or {}
+        except Exception:
+            return {}
+
+    def _save_progress(self, base_url_index: int, page: int) -> None:
+        try:
+            os.makedirs('data', exist_ok=True)
+            data = {
+                'base_url_index': int(base_url_index),
+                'page': int(page),
+                'ts': int(time.time()),
+            }
+            with open(self._progress_path(), 'w', encoding='utf-8') as f:
+                json.dump(data, f)
+        except Exception:
+            pass
+
+    def _clear_progress(self) -> None:
+        try:
+            p = self._progress_path()
+            if os.path.isfile(p):
+                os.remove(p)
+        except Exception:
+            pass
+
     def link_job_apply(self) -> None:
         count_applied = 0
         count_jobs = 0
@@ -227,6 +258,15 @@ class LinkedIn:
             print('No URLs to process.')
             return
 
+        # Load resume progress (base URL index and page number)
+        progress = self._load_progress()
+        start_base_idx = int(progress.get('base_url_index', 0))
+        start_page_idx = int(progress.get('page', 0))
+        if start_base_idx >= len(url_data):
+            # If progress exceeds current URL list, reset to end
+            start_base_idx = len(url_data) - 1 if url_data else 0
+            start_page_idx = 0
+
         # Load already-applied jobs
         print("\n[INFO] Loading previously applied jobs...")
         applied_jobs = utils.get_applied_jobs()
@@ -235,7 +275,9 @@ class LinkedIn:
         print("[INFO] Bot started. To pause, create file: data/pause_bot.txt")
         print("[INFO] To resume, delete the pause file.\n")
 
-        for base_url in url_data:
+        for idx, base_url in enumerate(url_data):
+            if idx < start_base_idx:
+                continue
             # Check for pause
             if os.path.exists(self.pause_file):
                 print("\n[PAUSED] Bot paused. Delete data/pause_bot.txt to resume.")
@@ -246,11 +288,13 @@ class LinkedIn:
             time.sleep(random.uniform(3, 6))
             try:
                 total_jobs_el = WebDriverWait(self.driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, "//small[contains(.,'results') or contains(.,'result') or contains(.,'jobs') or contains(.,'Job')]"))
+                    EC.presence_of_element_located((By.XPATH, "//small[contains(.,'results') or contains(.,'result') or contains(.,'jobs') or contains(.,'Job')]") )
                 )
                 total_jobs = total_jobs_el.text
             except Exception:
                 print("No matching jobs found for URL:", base_url)
+                # If this URL has no jobs, move progress to next URL
+                self._save_progress(idx + 1, 0)
                 continue
             total_pages = utils.jobs_to_pages(total_jobs)
 
@@ -259,7 +303,10 @@ class LinkedIn:
             self.display_write_results(line_to_write)
 
             # BOT BEGINS TO VISIT THE BUILT URLS TO APPLY FOR THE JOBS HERE.
-            for page in range(total_pages):
+            page_start = start_page_idx if idx == start_base_idx else 0
+            for page in range(page_start, total_pages):
+                # Persist progress at the beginning of each page
+                self._save_progress(idx, page)
                 current_page_jobs = constants.jobsPerPage * page
                 url = base_url + "&start=" + str(current_page_jobs)
                 self.driver.get(url) # This line specifically
@@ -376,10 +423,16 @@ class LinkedIn:
                         except Exception:
                             pass
 
+            # Finished this base URL: set progress to next URL from the beginning
+            self._save_progress(idx + 1, 0)
+
             print(
                 f"Category: {url_words[0]}, {url_words[1]} | Applied: {count_applied} | "
                 f"Skipped: {count_skipped} | Saved: {count_saved} | Total processed: {count_jobs}"
             )
+
+        # Completed all URLs; clear progress
+        self._clear_progress()
 
     def try_submit_single_page(self) -> bool:
         # Try to submit immediately if single-page form
@@ -584,6 +637,7 @@ class LinkedIn:
 
     def _fill_text_like(self, modal):
         from selenium.webdriver.common.keys import Keys
+        years_default = self._env('YEARS_EXPERIENCE', self._env('YEARS_EXPERIENCE_WILDCARD', '2'))
         mappings = [
             (['phone', 'mobile', 'tel'], self._env('PHONE', '')),
             (['city', 'town'], self._env('CITY', '')),
@@ -595,9 +649,9 @@ class LinkedIn:
             (['github'], self._env('GITHUB_URL', '')),
             (['salary', 'compensation'], self._env('EXPECTED_SALARY', '')),
             (['notice', 'available', 'availability', 'start date'], self._env('START_DATE', '')),
-            (['years', 'experience'], self._env('YEARS_EXPERIENCE', '')),
+            (['years', 'experience'], years_default),
         ]
-        inputs = modal.find_elements(By.CSS_SELECTOR, "input[type='text'], input[type='tel'], input:not([type]), textarea")
+        inputs = modal.find_elements(By.CSS_SELECTOR, "input[type='text'], input[type='tel'], input[type='number'], input:not([type]), textarea")
         for el in inputs:
             try:
                 desc = " ".join(filter(None, [
@@ -620,6 +674,28 @@ class LinkedIn:
                         break
             except Exception:
                 continue
+        # Additionally, fill any number inputs associated with years/experience labels using the wildcard
+        try:
+            num_inputs = modal.find_elements(By.CSS_SELECTOR, "input[type='number']")
+            for el in num_inputs:
+                try:
+                    val = (el.get_attribute('value') or '').strip()
+                    if val:
+                        continue
+                    # Find nearby label/question text
+                    label_txt = (el.get_attribute('aria-label') or el.get_attribute('name') or '').lower()
+                    if not label_txt:
+                        try:
+                            lbl = el.find_element(By.XPATH, "ancestor::*[self::div or self::section][1]//*[self::label or self::p or self::span][1]")
+                            label_txt = (lbl.text or '').lower()
+                        except Exception:
+                            label_txt = ''
+                    if any(k in label_txt for k in ['year', 'experience']):
+                        el.send_keys(years_default)
+                except Exception:
+                    continue
+        except Exception:
+            pass
 
     def _upload_resume_if_needed(self, modal):
         path = self._env('RESUME_PATH', '')
@@ -661,7 +737,7 @@ class LinkedIn:
         for sub in lowered:
             try:
                 q = modal.find_element(By.XPATH,
-                    f".//*[self::p or self::span or self::div][contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '{sub}')]")
+                    f".//*[self::p or self::span or self::div or self::label][contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '{sub}')]")
                 container = q.find_element(By.XPATH, "ancestor::*[self::div or self::section or self::form][1]")
                 lbls = container.find_elements(By.XPATH, f".//label[normalize-space()='{choice}']")
                 for lbl in lbls:
@@ -671,6 +747,20 @@ class LinkedIn:
                         return True
                     except Exception:
                         continue
+                # Some dialogs render yes/no as a select
+                try:
+                    from selenium.webdriver.support.ui import Select
+                    sel = container.find_element(By.TAG_NAME, 'select')
+                    s = Select(sel)
+                    for opt in s.options:
+                        if (opt.text or '').strip().lower().startswith(choice.lower()):
+                            try:
+                                s.select_by_visible_text(opt.text)
+                            except Exception:
+                                s.select_by_value(opt.get_attribute('value'))
+                            return True
+                except Exception:
+                    pass
             except Exception:
                 continue
         return False
@@ -679,6 +769,20 @@ class LinkedIn:
         # simple dropdown handling using expected values from env
         desired_city = self._env('CITY', '')
         selects = modal.find_elements(By.TAG_NAME, 'select')
+        from selenium.webdriver.support.ui import Select
+        def select_if_matches(s: Select, matcher_predicates) -> bool:
+            for opt in s.options:
+                text = (opt.text or '').strip().lower()
+                if any(pred(text) for pred in matcher_predicates):
+                    try:
+                        s.select_by_visible_text(opt.text)
+                    except Exception:
+                        try:
+                            s.select_by_value(opt.get_attribute('value'))
+                        except Exception:
+                            continue
+                    return True
+            return False
         for sel in selects:
             try:
                 desc = " ".join(filter(None, [
@@ -686,15 +790,100 @@ class LinkedIn:
                     (sel.get_attribute('name') or ''),
                     (sel.get_attribute('id') or ''),
                 ])).lower()
-                from selenium.webdriver.support.ui import Select
                 s = Select(sel)
+                # City
                 if 'city' in desc and desired_city:
                     for opt in s.options:
                         if desired_city.lower() in (opt.text or '').lower():
                             s.select_by_visible_text(opt.text)
-                            break
+                            continue
+                # Work authorization status -> US Citizen or Yes
+                if any(k in desc for k in ['work authorization', 'authorization status', 'citizen', 'citizenship', 'gc holder']):
+                    matchers = [
+                        lambda t: any(tok in t for tok in ['us citizen', 'u.s. citizen', 'united states citizen', 'citizen']),
+                        lambda t: t.startswith('yes') or t == 'yes'
+                    ]
+                    if select_if_matches(s, matchers):
+                        continue
+                # W2 questions -> Yes
+                if any(k in desc for k in ['w2', 'w-2']):
+                    if select_if_matches(s, [lambda t: 'yes' == t or t.startswith('yes')]):
+                        continue
+                # Sponsorship -> No
+                if any(k in desc for k in ['sponsor', 'sponsorship', 'visa']):
+                    if select_if_matches(s, [lambda t: 'no' == t or t.startswith('no')]):
+                        continue
             except Exception:
                 continue
+        # Also handle custom artdeco combobox dropdowns near question text
+        def choose_artdeco_near_text(keywords, choices) -> bool:
+            for kw in keywords:
+                try:
+                    q = modal.find_element(By.XPATH,
+                        f".//*[self::label or self::p or self::span or self::div][contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '{kw.lower()}')]")
+                    container = q.find_element(By.XPATH, "ancestor::*[self::div or self::section or self::form][1]")
+                    try:
+                        trigger = container.find_element(By.XPATH, ".//button[contains(@class,'artdeco-dropdown__trigger') or @aria-haspopup='listbox'] | .//*[@role='combobox']")
+                        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", trigger)
+                        try:
+                            trigger.click()
+                        except Exception:
+                            self.driver.execute_script('arguments[0].click();', trigger)
+                        time.sleep(0.3)
+                        for choice in choices:
+                            try:
+                                opt = modal.find_element(By.XPATH,
+                                    f".//*[@role='listbox']//*[self::div or self::span or self::li][contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '{choice.lower()}')]")
+                                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", opt)
+                                opt.click()
+                                return True
+                            except Exception:
+                                continue
+                    except Exception:
+                        pass
+                except Exception:
+                    continue
+            return False
+        try:
+            choose_artdeco_near_text(['work authorization', 'authorization status', 'citizen', 'citizenship', 'gc holder'],
+                                     ['US Citizen', 'U.S. Citizen', 'United States Citizen', 'Yes'])
+            choose_artdeco_near_text(['w2', 'w-2'], ['Yes'])
+            choose_artdeco_near_text(['sponsor', 'sponsorship', 'visa'], ['No'])
+        except Exception:
+            pass
+        # Also handle selects that are not well-described by attribute text by locating them near question text
+        try:
+            def set_select_near_text(keywords, choice_texts):
+                for kw in keywords:
+                    try:
+                        q = modal.find_element(By.XPATH,
+                            f".//*[self::label or self::p or self::span or self::div][contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '{kw.lower()}')]")
+                        container = q.find_element(By.XPATH, "ancestor::*[self::div or self::section or self::form][1]")
+                        sels = container.find_elements(By.TAG_NAME, 'select')
+                        for sel in sels:
+                            try:
+                                s = Select(sel)
+                                lowered = [c.lower() for c in choice_texts]
+                                for opt in s.options:
+                                    t = (opt.text or '').strip().lower()
+                                    if any(ct in t for ct in lowered):
+                                        try:
+                                            s.select_by_visible_text(opt.text)
+                                        except Exception:
+                                            s.select_by_value(opt.get_attribute('value'))
+                                        return True
+                            except Exception:
+                                continue
+                    except Exception:
+                        continue
+                return False
+            # Apply heuristics
+            set_select_near_text(['work authorization', 'authorization status', 'citizen', 'citizenship', 'gc holder'],
+                                  ['US Citizen', 'U.S. Citizen', 'United States Citizen', 'Citizen', 'Yes'])
+            set_select_near_text(['w2', 'w-2'], ['Yes'])
+            set_select_near_text(['sponsor', 'sponsorship', 'visa'], ['No'])
+        except Exception:
+            pass
 
     def _handle_follow_company(self):
         try:
@@ -716,6 +905,41 @@ class LinkedIn:
         except Exception:
             return False
 
+    def _has_validation_errors(self, modal) -> bool:
+        try:
+            # Generic red validation messages
+            msgs = modal.find_elements(By.XPATH, ".//*[contains(text(),'Please enter a valid answer') or contains(text(),'Enter a decimal number') or @aria-invalid='true']")
+            return any(m.is_displayed() for m in msgs)
+        except Exception:
+            return False
+
+    def _ensure_years_fields(self, modal):
+        years_default = self._env('YEARS_EXPERIENCE', self._env('YEARS_EXPERIENCE_WILDCARD', '2'))
+        # Find inputs that are empty and related to years/experience
+        inputs = modal.find_elements(By.XPATH, ".//input[@type='number' or @inputmode='decimal' or @inputmode='numeric' or not(@type) or @type='text']")
+        for el in inputs:
+            try:
+                val = (el.get_attribute('value') or '').strip()
+                if val:
+                    continue
+                # Determine context text nearby
+                ctx = " ".join(filter(None, [
+                    el.get_attribute('aria-label') or '',
+                    el.get_attribute('name') or '',
+                    el.get_attribute('placeholder') or '',
+                ])).lower()
+                if not ctx:
+                    try:
+                        lab = el.find_element(By.XPATH, "ancestor::*[self::div or self::section or self::form][1]//*[self::label or self::p or self::span][1]")
+                        ctx = (lab.text or '').lower()
+                    except Exception:
+                        ctx = ''
+                if any(k in ctx for k in ['year', 'experience']):
+                    self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", el)
+                    el.send_keys(years_default)
+            except Exception:
+                continue
+
     def _fill_current_step(self):
         modal = self._get_modal()
         if not modal:
@@ -725,15 +949,24 @@ class LinkedIn:
         self._fill_selects(modal)
 
         # Yes/No questions
+        # Work authorization in US -> Yes by default
         self._answer_yes_no(modal, [
-            'authorized to work', 'legally authorized', 'eligible to work'
+            'authorized to work', 'legally authorized', 'eligible to work', 'work authorization'
         ], self._env_bool('WORK_AUTH', True))
+        # Sponsorship -> No
         self._answer_yes_no(modal, [
-            'require sponsorship', 'require visa sponsorship', 'now or in the future require sponsorship'
+            'require sponsorship', 'require visa sponsorship', 'now or in the future require sponsorship', 'need sponsorship'
         ], self._env_bool('SPONSORSHIP', False))
+        # W2 -> Yes
+        self._answer_yes_no(modal, [
+            'w2', 'w-2', 'work on our w2'
+        ], True)
+        # Relocation (default False)
         self._answer_yes_no(modal, [
             'relocat'
         ], self._env_bool('RELOCATE', False))
+        # Ensure any remaining year/experience numeric fields are populated
+        self._ensure_years_fields(modal)
 
     def apply_process_multi_step(self, offer_page: str) -> str:
         try:
@@ -741,6 +974,19 @@ class LinkedIn:
             for _ in range(8):
                 time.sleep(random.uniform(1.5, 3.5))
                 self._fill_current_step()
+
+                modal = self._get_modal()
+                if modal and self._has_validation_errors(modal):
+                    # Resolve known errors: choose dropdowns and fill year fields again
+                    try:
+                        self._fill_selects(modal)
+                        self._ensure_years_fields(modal)
+                    except Exception:
+                        pass
+                    # After fixing, re-check before attempting to advance
+                    if modal and self._has_validation_errors(modal):
+                        # Don't attempt to advance yet; let loop iterate to refill
+                        continue
 
                 # Click Continue/Next; else try Review; else break
                 advanced = False
