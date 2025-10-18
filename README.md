@@ -17,13 +17,13 @@
 
 ## A Python bot that will apply to the, "Easy Apply", jobs based on your preferences.
 
-<br>
-
-![bot-works-apply-to.png](images/bot-works-apply-to.png)
+![LinkedIn Bot Demo](images/bot-demo-01.png)
+*The LinkedIn bot in action - showing the Easy Apply process with IDE debugging view*
 
 - This Bot is based on my earlier [LinkedIn Bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
-<br>
+
+ <br>
 
 ## Table of Contents
 - [Features](#features)
