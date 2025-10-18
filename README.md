@@ -22,9 +22,8 @@
 
 - This Bot is based on my earlier [LinkedIn Bot](https://github.com/LinuxUser255/linkedin-application-bot)
 
-![bot-demo-01.png](images/bot-demo-01.png)
 
-- <br>
+ <br>
 
 ## Table of Contents
 - [Features](#features)
