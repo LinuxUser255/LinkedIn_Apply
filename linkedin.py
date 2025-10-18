@@ -258,10 +258,11 @@ class LinkedIn:
             line_to_write = f"\n Category: {url_words[0]}, Location: {url_words[1]}, Applying {total_jobs} jobs."
             self.display_write_results(line_to_write)
 
+            # BOT BEGINS TO VISIT THE BUILT URLS TO APPLY FOR THE JOBS HERE.
             for page in range(total_pages):
                 current_page_jobs = constants.jobsPerPage * page
                 url = base_url + "&start=" + str(current_page_jobs)
-                self.driver.get(url)
+                self.driver.get(url) # This line specifically
                 time.sleep(random.uniform(5, constants.botSpeed))
 
                 offers_per_page = self.driver.find_elements(By.XPATH, "//li[@data-occludable-job-id]")
