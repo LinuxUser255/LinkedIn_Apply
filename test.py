@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
-import config
+from src.bot import config
 
 def check_selenium_linkedin():
     """

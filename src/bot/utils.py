@@ -1,7 +1,8 @@
 """
 Utilities
 """
-import math, constants, config
+import math
+from . import constants, config
 from typing import List
 import time
 import os

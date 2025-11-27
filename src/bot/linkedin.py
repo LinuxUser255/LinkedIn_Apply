@@ -15,9 +15,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
 import json
 
-import config
-import constants
-import utils
+from . import config
+from . import constants
+from . import utils
 
 
 class LinkedIn:
