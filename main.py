@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from linkedin import LinkedIn
+from src.bot import LinkedIn
 
 
 def run_bot():
