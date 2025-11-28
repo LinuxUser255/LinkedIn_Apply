@@ -8,6 +8,7 @@ from typing import Optional
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -25,7 +26,18 @@ class LinkedIn:
         # Load project .env if present, then overlay with profile credentials
         load_dotenv()  # Load .env if present
         self._load_profile_credentials()
-        self.driver = self._init_chrome()
+        try:
+            self.driver = self._init_chrome()
+        except Exception as e:
+            print(f"\n[FATAL] Could not start the bot: {e}")
+            print("\nTroubleshooting steps:")
+            print("1. Ensure Chrome browser is installed")
+            print("2. Ensure ChromeDriver is installed and matches your Chrome version")
+            print("3. Check ChromeDriver is in PATH or install it:")
+            print("   - Ubuntu/Debian: sudo apt-get install chromium-driver")
+            print("   - Or download from: https://chromedriver.chromium.org/")
+            import sys
+            sys.exit(1)
 
     def _load_profile_credentials(self) -> None:
         try:
@@ -73,51 +85,108 @@ class LinkedIn:
             print(f"[DEBUG] Error in _load_profile_credentials: {e}")
 
     def _init_chrome(self) -> webdriver.Chrome:
-        options = Options()
-        if getattr(config, 'headless', False) or os.getenv('HEADLESS', 'false').lower() in ('1','true','yes'):
-            options.add_argument('--headless=new')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        options.add_argument('--window-size=1280,800')
-        options.add_argument('--disable-blink-features=AutomationControlled')
-        options.add_argument('--no-first-run')
-        options.add_argument('--no-default-browser-check')
-        options.add_argument('--disable-search-engine-choice-screen')
+        try:
+            options = Options()
+            if getattr(config, 'headless', False) or os.getenv('HEADLESS', 'false').lower() in ('1','true','yes'):
+                options.add_argument('--headless=new')
+            options.add_argument('--disable-gpu')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument('--window-size=1280,800')
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument('--no-first-run')
+            options.add_argument('--no-default-browser-check')
+            options.add_argument('--disable-search-engine-choice-screen')
 
-        # Resolve and prepare Chrome user data dir (profile)
-        profile_env = os.getenv('CHROME_PROFILE_PATH', '').strip()
-        profile_env = os.path.expanduser(os.path.expandvars(profile_env)) if profile_env else ''
-        if profile_env:
-            user_data_dir = profile_env
-            profile_dir = os.getenv('CHROME_PROFILE_DIR', '').strip()
+            # Resolve and prepare Chrome user data dir (profile)
+            profile_env = os.getenv('CHROME_PROFILE_PATH', '').strip()
+            profile_env = os.path.expanduser(os.path.expandvars(profile_env)) if profile_env else ''
+            if profile_env:
+                user_data_dir = profile_env
+                profile_dir = os.getenv('CHROME_PROFILE_DIR', '').strip()
 
-            # If CHROME_PROFILE_PATH points to a specific profile subdir (e.g., .../Default or .../Profile 1),
-            # split it into user-data-dir and profile-directory automatically.
-            base = os.path.basename(user_data_dir.rstrip(os.sep))
-            if not profile_dir and (base.lower() == 'default' or base.lower().startswith('profile ')):
-                profile_dir = base
-                user_data_dir = os.path.dirname(user_data_dir)
+                # If CHROME_PROFILE_PATH points to a specific profile subdir (e.g., .../Default or .../Profile 1),
+                # split it into user-data-dir and profile-directory automatically.
+                base = os.path.basename(user_data_dir.rstrip(os.sep))
+                if not profile_dir and (base.lower() == 'default' or base.lower().startswith('profile ')):
+                    profile_dir = base
+                    user_data_dir = os.path.dirname(user_data_dir)
 
-            # Ensure directory exists
+                # Ensure directory exists
+                try:
+                    os.makedirs(user_data_dir, exist_ok=True)
+                except Exception:
+                    pass
+
+                options.add_argument(f'--user-data-dir={user_data_dir}')
+                if profile_dir:
+                    options.add_argument(f'--profile-directory={profile_dir}')
+                else:
+                    # Default profile name in a fresh user-data-dir is "Default"
+                    options.add_argument('--profile-directory=Default')
+
+            # Use Chrome binary from env, or default to project Chrome
+            binary_path = os.getenv('CHROME_BINARY', '').strip()
+            if binary_path:
+                options.binary_location = binary_path
+            elif os.path.exists('./chrome-linux64/chrome'):
+                options.binary_location = './chrome-linux64/chrome'
+                print("[INFO] Using project Chrome binary: ./chrome-linux64/chrome")
+
+            print("[INFO] Initializing Chrome driver...")
+            
+            # Try to initialize Chrome driver with various methods
+            driver = None
+            
+            # Method 1: Try with default webdriver manager
             try:
-                os.makedirs(user_data_dir, exist_ok=True)
-            except Exception:
-                pass
-
-            options.add_argument(f'--user-data-dir={user_data_dir}')
-            if profile_dir:
-                options.add_argument(f'--profile-directory={profile_dir}')
-            else:
-                # Default profile name in a fresh user-data-dir is "Default"
-                options.add_argument('--profile-directory=Default')
-
-        binary_path = os.getenv('CHROME_BINARY', '').strip()
-        if binary_path:
-            options.binary_location = binary_path
-
-        driver = webdriver.Chrome(options=options)
-        return driver
+                driver = webdriver.Chrome(options=options)
+                print("[INFO] Chrome driver initialized successfully (default)")
+                return driver
+            except Exception as e1:
+                print(f"[DEBUG] Default Chrome initialization failed: {e1}")
+                
+                # Method 2: Try to find ChromeDriver in common locations
+                import shutil
+                chromedriver_path = shutil.which('chromedriver')
+                if chromedriver_path:
+                    print(f"[DEBUG] Found ChromeDriver at: {chromedriver_path}")
+                    try:
+                        service = Service(chromedriver_path)
+                        driver = webdriver.Chrome(service=service, options=options)
+                        print("[INFO] Chrome driver initialized successfully (explicit path)")
+                        return driver
+                    except Exception as e2:
+                        print(f"[DEBUG] ChromeDriver with explicit path failed: {e2}")
+                
+                # Method 3: Try common installation paths
+                common_paths = [
+                    './chromedriver',  # Check project root first
+                    '/usr/bin/chromedriver',
+                    '/usr/local/bin/chromedriver',
+                    '/opt/chromedriver/chromedriver',
+                    './chrome-linux64/chromedriver'
+                ]
+                
+                for path in common_paths:
+                    if os.path.exists(path):
+                        print(f"[DEBUG] Trying ChromeDriver at: {path}")
+                        try:
+                            service = Service(path)
+                            driver = webdriver.Chrome(service=service, options=options)
+                            print(f"[INFO] Chrome driver initialized successfully from {path}")
+                            return driver
+                        except Exception:
+                            continue
+                
+                # If all methods failed, raise the original exception
+                raise Exception(f"Could not initialize Chrome driver. Original error: {e1}")
+            return driver
+        except Exception as e:
+            print(f"[ERROR] Failed to initialize Chrome driver: {e}")
+            print("[HINT] Make sure Chrome and ChromeDriver are installed and in PATH")
+            print("[HINT] You can install ChromeDriver with: sudo apt-get install chromium-driver")
+            raise
 
     def login(self) -> None:
         # Prefer using existing logged-in Chrome profile if CHROME_PROFILE_PATH is provided.
