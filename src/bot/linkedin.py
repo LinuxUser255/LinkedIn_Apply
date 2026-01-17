@@ -19,6 +19,7 @@ import json
 from . import config
 from . import constants
 from . import utils
+from .dynamic_form_handler import DynamicFormHandler
 
 
 class LinkedIn:
@@ -28,6 +29,8 @@ class LinkedIn:
         self._load_profile_credentials()
         try:
             self.driver = self._init_chrome()
+            # Initialize dynamic form handler
+            self.dynamic_form_handler = None  # Initialize lazily to avoid errors if config missing
         except Exception as e:
             print(f"\n[FATAL] Could not start the bot: {e}")
             print("\nTroubleshooting steps:")
@@ -954,14 +957,161 @@ class LinkedIn:
         except Exception:
             pass
 
-    def _handle_follow_company(self):
+    def _handle_follow_company(self, modal=None):
+        """Ensure follow company checkbox is unchecked. Supports multiple LinkedIn checkbox variations."""
         try:
-            if not getattr(config, 'followCompanies', False):
-                follow_label = self.driver.find_element(By.CSS_SELECTOR, "label[for='follow-company-checkbox']")
-                if follow_label:
-                    follow_label.click()
+            # Check config/env to see if we want to follow companies (default: False)
+            should_follow = (
+                getattr(config, 'followCompanies', False) or
+                self._env_bool('FOLLOW_COMPANIES', False)
+            )
+            
+            if should_follow:
+                print("[DEBUG] User configured to follow companies, skipping uncheck")
+                return
+            
+            # Search context: if modal provided, search within it, otherwise search full page
+            search_context = modal if modal else self.driver
+            
+            # Strategy 1: Standard follow-company-checkbox
+            selectors_to_try = [
+                "label[for='follow-company-checkbox']",
+                "input[id='follow-company-checkbox']",
+                "#follow-company-checkbox",
+                "input[name*='follow']",
+                "input[id*='follow']"
+            ]
+            
+            for selector in selectors_to_try:
+                try:
+                    elements = search_context.find_elements(By.CSS_SELECTOR, selector)
+                    for element in elements:
+                        if self._uncheck_follow_element(element):
+                            print("[INFO] Successfully unchecked follow company checkbox")
+                            return
+                except Exception:
+                    continue
+            
+            # Strategy 2: Find by text content (more robust for different layouts)
+            text_patterns = [
+                'follow', 'follow company', 'follow this company', 'follow organization'
+            ]
+            
+            for pattern in text_patterns:
+                try:
+                    # Find labels/spans containing follow text
+                    elements = search_context.find_elements(By.XPATH, 
+                        f".//*[self::label or self::span or self::div][contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'), '{pattern}')]")
+                    
+                    for element in elements:
+                        # Look for associated checkbox
+                        checkbox = self._find_associated_checkbox(element)
+                        if checkbox and self._uncheck_follow_element(checkbox):
+                            print(f"[INFO] Successfully unchecked follow company checkbox (via text: {pattern})")
+                            return
+                except Exception:
+                    continue
+            
+            # Strategy 3: Look for any checked checkbox near submit area
+            try:
+                checkboxes = search_context.find_elements(By.CSS_SELECTOR, "input[type='checkbox']:checked")
+                for checkbox in checkboxes:
+                    # Check if this might be a follow checkbox by context
+                    context = self._get_checkbox_context(checkbox)
+                    if any(word in context for word in ['follow', 'company', 'organization']):
+                        if self._uncheck_follow_element(checkbox):
+                            print("[INFO] Successfully unchecked follow company checkbox (via context analysis)")
+                            return
+            except Exception:
+                pass
+                
+        except Exception as e:
+            print(f"[DEBUG] Error in follow company handling: {e}")
+    
+    def _uncheck_follow_element(self, element) -> bool:
+        """Uncheck a follow company element, handling both labels and inputs."""
+        try:
+            if element.tag_name.lower() == 'label':
+                # For labels, find the associated input
+                for_attr = element.get_attribute('for')
+                if for_attr:
+                    try:
+                        checkbox = self.driver.find_element(By.ID, for_attr)
+                        return self._uncheck_checkbox(checkbox)
+                    except:
+                        pass
+                
+                # Try to find nested input
+                try:
+                    checkbox = element.find_element(By.CSS_SELECTOR, "input[type='checkbox']")
+                    return self._uncheck_checkbox(checkbox)
+                except:
+                    pass
+                    
+                # Click the label itself if checkbox is already checked
+                try:
+                    # Find any checkbox in the same container
+                    container = element.find_element(By.XPATH, "ancestor::*[1]")
+                    checkbox = container.find_element(By.CSS_SELECTOR, "input[type='checkbox']")
+                    if checkbox.is_selected():
+                        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+                        element.click()
+                        return True
+                except:
+                    pass
+                    
+            elif element.tag_name.lower() == 'input':
+                return self._uncheck_checkbox(element)
+                
+            return False
         except Exception:
+            return False
+    
+    def _uncheck_checkbox(self, checkbox) -> bool:
+        """Uncheck a checkbox element if it's currently checked."""
+        try:
+            if checkbox.is_selected():
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", checkbox)
+                checkbox.click()
+                return True
+            return True  # Already unchecked
+        except Exception:
+            return False
+    
+    def _find_associated_checkbox(self, text_element):
+        """Find checkbox associated with a text element."""
+        try:
+            # Look for checkbox in same container
+            container = text_element.find_element(By.XPATH, "ancestor::*[self::div or self::section or self::form][1]")
+            checkboxes = container.find_elements(By.CSS_SELECTOR, "input[type='checkbox']")
+            if checkboxes:
+                return checkboxes[0]  # Return first checkbox found
+        except:
             pass
+        return None
+    
+    def _get_checkbox_context(self, checkbox) -> str:
+        """Get contextual text around a checkbox to determine its purpose."""
+        context_text = ""
+        try:
+            # Get text from various attributes
+            attrs = ['aria-label', 'name', 'id', 'data-test-id']
+            for attr in attrs:
+                value = checkbox.get_attribute(attr)
+                if value:
+                    context_text += f" {value}"
+            
+            # Get text from nearby elements
+            try:
+                container = checkbox.find_element(By.XPATH, "ancestor::*[1]")
+                context_text += f" {container.text}"
+            except:
+                pass
+                
+        except:
+            pass
+        
+        return context_text.lower()
 
     def _click_button_if_present(self, selector, timeout=3) -> bool:
         try:
@@ -1013,6 +1163,8 @@ class LinkedIn:
         modal = self._get_modal()
         if not modal:
             return
+        
+        # First try the existing static form handling
         self._fill_text_like(modal)
         self._upload_resume_if_needed(modal)
         self._fill_selects(modal)
@@ -1034,8 +1186,34 @@ class LinkedIn:
         self._answer_yes_no(modal, [
             'relocat'
         ], self._env_bool('RELOCATE', False))
+        
         # Ensure any remaining year/experience numeric fields are populated
         self._ensure_years_fields(modal)
+        
+        # Handle follow company checkbox (ensure it's unchecked)
+        self._handle_follow_company(modal)
+        
+        # Finally, use dynamic form handler for any remaining unhandled elements
+        self._handle_dynamic_form_elements(modal)
+
+    def _handle_dynamic_form_elements(self, modal):
+        """Handle dynamic form elements using the pattern-based form handler."""
+        try:
+            # Initialize dynamic form handler lazily
+            if self.dynamic_form_handler is None:
+                self.dynamic_form_handler = DynamicFormHandler(self.driver)
+            
+            # Process dynamic form elements
+            results = self.dynamic_form_handler.process_dynamic_form(modal)
+            
+            # Log results for debugging
+            if results.get('handled'):
+                print(f"[INFO] Dynamic handler processed {len(results['handled'])} elements")
+            if results.get('errors'):
+                print(f"[DEBUG] Dynamic handler had {len(results['errors'])} errors")
+                
+        except Exception as e:
+            print(f"[DEBUG] Error in dynamic form handler: {e}")
 
     def apply_process_multi_step(self, offer_page: str) -> str:
         try:

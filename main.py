@@ -7,7 +7,7 @@ def run_bot():
     import time
     print("[MAIN] Starting bot...")
     try:
-        bot = LinkedIn()
+        bot = LinkedIn() # LinkedIn Bot object instance creation
         print("[MAIN] LinkedIn instance created")
     except Exception as e:
         print(f"[MAIN] Failed to create LinkedIn instance: {e}")
