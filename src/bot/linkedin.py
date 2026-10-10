@@ -13,6 +13,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.keys import Keys
 
 from dotenv import load_dotenv
 import json
@@ -22,6 +23,7 @@ from . import constants
 from . import utils
 from .chrome_paths import find_browser, find_local_chromedriver
 from .dynamic_form_handler import DynamicFormHandler
+from . import login_page
 from .profiles import Profile, activate
 
 
@@ -219,64 +221,13 @@ class LinkedIn:
             if any(s in self.driver.current_url for s in ('linkedin.com/feed', 'linkedin.com/jobs')):
                 return
 
-            # Otherwise, we're on the login page.
-            # Fill credentials only if fields are present.
-            try:
-                username_el = WebDriverWait(self.driver, 5).until(
-                    EC.presence_of_element_located((By.ID, 'username'))
-                )
-                password_el = self.driver.find_element(By.ID, 'password')
-
-                if email:
-                    try:
-                        username_el.clear()
-                    except Exception:
-                        pass
-                    username_el.send_keys(email)
-                # Without a saved password, the user signs in by hand (see below).
-                if password:
-                    try:
-                        password_el.clear()
-                    except Exception:
-                        pass
-                    password_el.send_keys(password)
-
-                    # Ensure "Remember me" is checked if present.
-                    remember_clicked = False
-                    remember_input_selectors = [
-                        (By.ID, 'remember-me-checkbox'),
-                        (By.NAME, 'rememberMe'),
-                        (By.CSS_SELECTOR, "input[type='checkbox'][name*='remember']"),
-                        (By.CSS_SELECTOR, "input[type='checkbox'][id*='remember']"),
-                    ]
-                    for by, sel in remember_input_selectors:
-                        try:
-                            el = self.driver.find_element(by, sel)
-                            if el.get_attribute('type') == 'checkbox' and not el.is_selected():
-                                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
-                                el.click()
-                            remember_clicked = True
-                            break
-                        except Exception:
-                            continue
-                    if not remember_clicked:
-                        # Fall back to clicking the label if inputs weren't found
-                        try:
-                            lbl = self.driver.find_element(By.CSS_SELECTOR, "label[for*='remember']")
-                            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", lbl)
-                            lbl.click()
-                        except Exception:
-                            pass
-
-                    sign_in_button_xpath = (
-                        "//button[contains(@class,'btn__primary--large') and contains(@type,'submit')]"
-                    )
-                    WebDriverWait(self.driver, 15).until(
-                        EC.element_to_be_clickable((By.XPATH, sign_in_button_xpath))
-                    ).click()
-            except Exception:
-                # No login form; continue
-                pass
+            # Otherwise, we're on the sign-in page. Without a saved password,
+            # the user signs in by hand (see below).
+            if password:
+                try:
+                    self._submit_login_form(email, password)
+                except Exception as e:
+                    print(f"[WARN] Couldn't fill in the sign-in form automatically: {e}")
 
             # Signed in once LinkedIn shows the feed or jobs page
             signed_in = EC.any_of(
@@ -296,6 +247,34 @@ class LinkedIn:
             WebDriverWait(self.driver, 300).until(signed_in)
         except Exception as e:
             print(f"Login flow warning: {e}")
+
+    def _submit_login_form(self, email: str, password: str) -> None:
+        """Fill in and submit LinkedIn's sign-in form, reporting anything missing."""
+        try:
+            password_field = WebDriverWait(self.driver, 10).until(login_page.find_password_field)
+        except TimeoutException:
+            print(f"[WARN] Couldn't find the password field on the sign-in page ({self.driver.current_url}).")
+            return
+
+        # The "welcome back" page shows only a password field for a remembered account.
+        email_field = login_page.find_email_field(self.driver)
+        fields = [(email_field, email), (password_field, password)] if email_field else [(password_field, password)]
+        for field, value in fields:
+            if value:
+                field.clear()
+                field.send_keys(value)
+
+        for checkbox in login_page.find_keep_signed_in_checkboxes(self.driver):
+            if not checkbox.is_selected():
+                # Styled checkboxes are hidden, so click them with JavaScript.
+                self.driver.execute_script("arguments[0].click();", checkbox)
+
+        sign_in_button = login_page.find_sign_in_button(self.driver)
+        if sign_in_button:
+            sign_in_button.click()
+        else:
+            password_field.send_keys(Keys.ENTER)
+        print("[INFO] Submitted the sign-in form.")
 
     def generate_urls(self) -> None:
         os.makedirs(utils.data_path(), exist_ok=True)
