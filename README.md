@@ -186,8 +186,8 @@ cp config_forms/credentials.json "$HOME/.config/LinkedIn_Apply_Profile/credentia
 ```shell
 git clone https://github.com/LinuxUser255/LinkedIn_Apply.git
 cd LinkedIn_Apply
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+./setup_venv.sh            # creates .venv/ and installs requirements.txt
+source .venv/bin/activate
 ```
 
 ### Run tests (optional)

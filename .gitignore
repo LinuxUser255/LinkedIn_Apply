@@ -20,9 +20,7 @@ __pycache__/
 *$py.class
 .venv/
 venv/
-venv-linkedin-bot/
 env/
-config.py
 
 # Environment variables and credentials
 .env
