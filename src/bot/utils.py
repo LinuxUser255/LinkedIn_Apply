@@ -6,16 +6,30 @@ from . import constants, config
 from typing import List
 import time
 import os
+from pathlib import Path
+
+_data_dir = Path("data")
+
+
+def set_data_dir(path: "os.PathLike[str] | str") -> None:
+    """Write results to ``path`` (e.g. the active profile's folder)."""
+    global _data_dir
+    _data_dir = Path(path)
+
+
+def data_path(*parts: str) -> str:
+    """Return the results folder, or a file inside it."""
+    return str(_data_dir.joinpath(*parts))
 
 
 def get_url_data_file() -> List[str]:
     url_data: List[str] = []
     try:
-        with open('data/urlData.txt', 'r', encoding='utf-8') as file:
+        with open(data_path('urlData.txt'), 'r', encoding='utf-8') as file:
             url_data = [line.strip() for line in file if line.strip()]
     except FileNotFoundError:
-        text = ("FileNotFound: data/urlData.txt file is not found. Please ensure ./data folder exists and check "
-                "config.py values. Then run the bot again")
+        text = (f"FileNotFound: {data_path('urlData.txt')} file is not found. Check your profile's "
+                "job search settings (python3 main.py setup), then run the bot again")
         print(text)
     return url_data
 
@@ -60,17 +74,17 @@ def url_to_keywords(url: str) -> List[str]:
 
 
 def write_results(text: str) -> None:
-    os.makedirs('data', exist_ok=True)
+    os.makedirs(data_path(), exist_ok=True)
     time_str = time.strftime("%Y%m%d")
     file_name = "Applied Jobs DATA - " + time_str + ".txt"
     try:
-        with open(os.path.join("data", file_name), 'r', encoding="utf-8") as file:
+        with open(data_path(file_name), 'r', encoding="utf-8") as file:
             lines = []
             for line in file:
                 if "----" not in line:
                     lines.append(line)
 
-        with open(os.path.join("data", file_name), 'w', encoding="utf-8") as f:
+        with open(data_path(file_name), 'w', encoding="utf-8") as f:
             f.write("---- Applied Jobs Data ---- created at: " + time_str + "\n")
             f.write(
                 "---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result " + "\n")
@@ -79,7 +93,7 @@ def write_results(text: str) -> None:
             f.write(text + "\n")
 
     except FileNotFoundError:
-        with open(os.path.join("data", file_name), 'w', encoding="utf-8") as f:
+        with open(data_path(file_name), 'w', encoding="utf-8") as f:
             f.write("---- Applied Jobs Data ---- created at: " + time_str + "\n")
             f.write(
                 "---- Number | Job Title | Company | Location | Work Place | Posted Date | Applications | Result " + "\n")
@@ -91,8 +105,8 @@ def print_info_mes(bot: str) -> None:
 
 
 def log_failed_job(link: str, reason: str = "") -> None:
-    os.makedirs('data', exist_ok=True)
-    path = os.path.join('data', 'failed_jobs.txt')
+    os.makedirs(data_path(), exist_ok=True)
+    path = data_path('failed_jobs.txt')
     with open(path, 'a', encoding='utf-8') as f:
         line = f"{link}"
         if reason:
@@ -101,10 +115,10 @@ def log_failed_job(link: str, reason: str = "") -> None:
 
 
 def append_url_for_manual_apply(link: str) -> None:
-    """Append a job URL to data/urlData.txt for manual follow-up if Easy Apply is unavailable."""
+    """Append a job URL to urlData.txt for manual follow-up if Easy Apply is unavailable."""
     try:
-        os.makedirs('data', exist_ok=True)
-        with open(os.path.join('data', 'urlData.txt'), 'a', encoding='utf-8') as f:
+        os.makedirs(data_path(), exist_ok=True)
+        with open(data_path('urlData.txt'), 'a', encoding='utf-8') as f:
             f.write(link + "\n")
     except Exception:
         pass
@@ -114,11 +128,11 @@ def get_applied_jobs() -> set:
     """Load set of already-applied job URLs from data files."""
     applied = set()
     try:
-        os.makedirs('data', exist_ok=True)
+        os.makedirs(data_path(), exist_ok=True)
         # Check all applied jobs data files
-        for fname in os.listdir('data'):
+        for fname in os.listdir(data_path()):
             if fname.startswith('Applied Jobs DATA'):
-                fpath = os.path.join('data', fname)
+                fpath = data_path(fname)
                 try:
                     with open(fpath, 'r', encoding='utf-8') as f:
                         for line in f:
@@ -131,7 +145,7 @@ def get_applied_jobs() -> set:
                 except Exception:
                     continue
         # Also check failed_jobs.txt
-        failed_path = os.path.join('data', 'failed_jobs.txt')
+        failed_path = data_path('failed_jobs.txt')
         if os.path.isfile(failed_path):
             try:
                 with open(failed_path, 'r', encoding='utf-8') as f:
@@ -244,7 +258,7 @@ class LinkedinUrlGenerate:
             job_type = "&f_JT=T"
         elif firstjob_type == "Volunteer":
             job_type = "&f_JT=V"
-        elif firstjob_type == "Intership":
+        elif firstjob_type in ("Internship", "Intership"):
             job_type = "&f_JT=I"
         elif firstjob_type == "Other":
             job_type = "&f_JT=O"
@@ -260,7 +274,7 @@ class LinkedinUrlGenerate:
                 job_type += "%2CT"
             elif job_type_array[index] == "Volunteer":
                 job_type += "%2CV"
-            elif job_type_array[index] == "Intership":
+            elif job_type_array[index] in ("Internship", "Intership"):
                 job_type += "%2CI"
             elif job_type_array[index] == "Other":
                 job_type += "%2CO"
@@ -320,7 +334,7 @@ class LinkedinUrlGenerate:
         sort_by = ""
         if config.sort[0] == "Recent":
             sort_by = "&sort_by=DD"
-        elif config.sort[0] == "Relevent":
+        elif config.sort[0] in ("Relevant", "Relevent"):
             sort_by = "&sort_by=R"
         return sort_by
 

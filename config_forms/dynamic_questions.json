@@ -1,0 +1,63 @@
+{
+  "question_patterns": {
+    "work_authorization": {
+      "keywords": ["legally authorized", "authorized to work", "legal right to work", "eligible to work"],
+      "answer_from_config": "WORK_AUTH",
+      "type": "yes_no"
+    },
+    "sponsorship": {
+      "keywords": ["sponsorship", "visa sponsorship", "require sponsorship"],
+      "answer_from_config": "SPONSORSHIP",
+      "type": "yes_no"
+    },
+    "relocation": {
+      "keywords": ["relocate", "relocation"],
+      "answer_from_config": "RELOCATE",
+      "type": "yes_no"
+    },
+    "salary_expectation": {
+      "keywords": ["salary", "compensation", "expected salary", "desired pay"],
+      "answer_from_config": "EXPECTED_SALARY",
+      "type": "text"
+    },
+    "start_date": {
+      "keywords": ["start date", "when can you start", "earliest start"],
+      "answer_from_config": "START_DATE",
+      "type": "text"
+    },
+    "background_check": {
+      "keywords": ["background check", "background screening"],
+      "answer": "Yes",
+      "type": "yes_no"
+    },
+    "drug_test": {
+      "keywords": ["drug test", "drug testing", "drug screen"],
+      "answer": "Yes",
+      "type": "yes_no"
+    },
+    "references": {
+      "keywords": ["references", "professional references"],
+      "answer": "Yes",
+      "type": "yes_no"
+    },
+    "follow_company": {
+      "keywords": ["follow company", "follow this company", "follow organization"],
+      "answer_from_config": "FOLLOW_COMPANIES",
+      "default_answer": "No",
+      "type": "checkbox"
+    }
+  },
+  "fallback_strategies": {
+    "yes_no_questions": {
+      "default_answer": "Yes",
+      "negative_keywords": ["sponsor", "sponsorship", "visa", "relocat"]
+    },
+    "dropdown_questions": {
+      "skip_if_unsure": true
+    },
+    "text_questions": {
+      "default_years": "2",
+      "default_text": "N/A"
+    }
+  }
+}

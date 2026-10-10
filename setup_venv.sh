@@ -17,7 +17,14 @@ VENV_DIR=".venv"
 PYTHON="${PYTHON:-python3}"
 
 if ! command -v "$PYTHON" >/dev/null 2>&1; then
-  echo "[-] $PYTHON not found on PATH." >&2
+  echo "[-] $PYTHON not found. Install Python 3.10 or newer from https://www.python.org/downloads/" >&2
+  exit 1
+fi
+
+if ! "$PYTHON" -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+  echo "[-] The bot needs Python 3.10 or newer, but $PYTHON is $("$PYTHON" -V 2>&1 | cut -d' ' -f2)." >&2
+  echo "    Install a newer Python from https://www.python.org/downloads/ (or: brew install python)," >&2
+  echo "    then run this script again. To pick a specific version: PYTHON=python3.12 ./setup_venv.sh" >&2
   exit 1
 fi
 

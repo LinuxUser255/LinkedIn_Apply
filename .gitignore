@@ -11,8 +11,16 @@ chrome
 google-chrome
 google-chrome-stable
 *.exe
+# Chrome for Testing downloads (any platform)
 chrome-linux64/
-chromedriver-linux64/
+chrome-mac-*/
+chrome-win*/
+chromedriver-*/
+# Chromium snapshot downloads
+chrome-mac/
+chrome-linux/
+chrome-win/
+chromedriver_*/
 
 # Python
 __pycache__/

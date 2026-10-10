@@ -17,7 +17,7 @@ The dynamic form handler solves the problem of varying LinkedIn application ques
 ## Configuration Files
 
 ### 1. Dynamic Questions Config
-**Location**: `~/.config/LinkedIn_Apply_Profile/dynamic_questions.json`
+**Location**: `~/.config/LinkedIn_Apply/profiles/<name>/dynamic_questions.json` (copied from `config_forms/dynamic_questions.json` when the profile is created)
 
 This file defines question patterns and how to answer them:
 
@@ -40,7 +40,7 @@ This file defines question patterns and how to answer them:
 ```
 
 ### 2. Credentials Config  
-**Location**: `~/.config/LinkedIn_Apply_Profile/credentials.json`
+**Location**: `~/.config/LinkedIn_Apply/profiles/<name>/profile.json` (written by `python3 main.py setup`)
 
 Contains your personal information used for dynamic answers.
 

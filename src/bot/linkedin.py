@@ -12,6 +12,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 from dotenv import load_dotenv
 import json
@@ -19,14 +20,21 @@ import json
 from . import config
 from . import constants
 from . import utils
+from .chrome_paths import find_browser, find_local_chromedriver
 from .dynamic_form_handler import DynamicFormHandler
+from .profiles import Profile, activate
 
 
 class LinkedIn:
-    def __init__(self) -> None:
-        # Load project .env if present, then overlay with profile credentials
-        load_dotenv()  # Load .env if present
-        self._load_profile_credentials()
+    def __init__(self, profile: Optional[Profile] = None) -> None:
+        """Start Chrome for ``profile``, or from .env settings if none is given."""
+        self.profile = profile
+        if profile:
+            activate(profile)
+        else:
+            # Legacy setup: project .env, overlaid with credentials in CHROME_PROFILE_PATH
+            load_dotenv()
+            self._load_profile_credentials()
         try:
             self.driver = self._init_chrome()
             # Initialize dynamic form handler
@@ -36,9 +44,8 @@ class LinkedIn:
             print("\nTroubleshooting steps:")
             print("1. Ensure Chrome browser is installed")
             print("2. Ensure ChromeDriver is installed and matches your Chrome version")
-            print("3. Check ChromeDriver is in PATH or install it:")
-            print("   - Ubuntu/Debian: sudo apt-get install chromium-driver")
-            print("   - Or download from: https://chromedriver.chromium.org/")
+            print("3. Download both from https://googlechromelabs.github.io/chrome-for-testing/")
+            print("   and unzip them into the project folder (see README Quick Start)")
             import sys
             sys.exit(1)
 
@@ -128,18 +135,27 @@ class LinkedIn:
                     # Default profile name in a fresh user-data-dir is "Default"
                     options.add_argument('--profile-directory=Default')
 
-            # Use Chrome binary from env, or default to project Chrome
-            binary_path = os.getenv('CHROME_BINARY', '').strip()
+            # CHROME_BINARY, else Chrome for Testing / Chromium in the project, else installed Chromium
+            binary_path = find_browser()
             if binary_path:
                 options.binary_location = binary_path
-            elif os.path.exists('./chrome-linux64/chrome'):
-                options.binary_location = './chrome-linux64/chrome'
-                print("[INFO] Using project Chrome binary: ./chrome-linux64/chrome")
+                print(f"[INFO] Using Chrome binary: {binary_path}")
 
             print("[INFO] Initializing Chrome driver...")
             
             # Try to initialize Chrome driver with various methods
             driver = None
+
+            # Method 0: ChromeDriver unzipped into the project folder
+            local_driver = find_local_chromedriver()
+            if local_driver:
+                try:
+                    driver = webdriver.Chrome(service=Service(local_driver), options=options)
+                    print(f"[INFO] Chrome driver initialized successfully from {local_driver}")
+                    return driver
+                except Exception as e0:
+                    print(f"[WARN] ChromeDriver at {local_driver} failed: {e0}")
+                    print("[WARN] Check that ChromeDriver and Chrome have the same version number.")
             
             # Method 1: Try with default webdriver manager
             try:
@@ -164,11 +180,10 @@ class LinkedIn:
                 
                 # Method 3: Try common installation paths
                 common_paths = [
-                    './chromedriver',  # Check project root first
                     '/usr/bin/chromedriver',
                     '/usr/local/bin/chromedriver',
                     '/opt/chromedriver/chromedriver',
-                    './chrome-linux64/chromedriver'
+                    '/snap/bin/chromium.chromedriver',
                 ]
                 
                 for path in common_paths:
@@ -187,8 +202,8 @@ class LinkedIn:
             return driver
         except Exception as e:
             print(f"[ERROR] Failed to initialize Chrome driver: {e}")
-            print("[HINT] Make sure Chrome and ChromeDriver are installed and in PATH")
-            print("[HINT] You can install ChromeDriver with: sudo apt-get install chromium-driver")
+            print("[HINT] Download Chrome and ChromeDriver (same version) from "
+                  "https://googlechromelabs.github.io/chrome-for-testing/ and unzip both into the project folder.")
             raise
 
     def login(self) -> None:
@@ -218,6 +233,7 @@ class LinkedIn:
                     except Exception:
                         pass
                     username_el.send_keys(email)
+                # Without a saved password, the user signs in by hand (see below).
                 if password:
                     try:
                         password_el.clear()
@@ -225,67 +241,76 @@ class LinkedIn:
                         pass
                     password_el.send_keys(password)
 
-                # Ensure "Remember me" is checked if present.
-                remember_clicked = False
-                remember_input_selectors = [
-                    (By.ID, 'remember-me-checkbox'),
-                    (By.NAME, 'rememberMe'),
-                    (By.CSS_SELECTOR, "input[type='checkbox'][name*='remember']"),
-                    (By.CSS_SELECTOR, "input[type='checkbox'][id*='remember']"),
-                ]
-                for by, sel in remember_input_selectors:
-                    try:
-                        el = self.driver.find_element(by, sel)
-                        if el.get_attribute('type') == 'checkbox' and not el.is_selected():
-                            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
-                            el.click()
-                        remember_clicked = True
-                        break
-                    except Exception:
-                        continue
-                if not remember_clicked:
-                    # Fall back to clicking the label if inputs weren't found
-                    try:
-                        lbl = self.driver.find_element(By.CSS_SELECTOR, "label[for*='remember']")
-                        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", lbl)
-                        lbl.click()
-                    except Exception:
-                        pass
+                    # Ensure "Remember me" is checked if present.
+                    remember_clicked = False
+                    remember_input_selectors = [
+                        (By.ID, 'remember-me-checkbox'),
+                        (By.NAME, 'rememberMe'),
+                        (By.CSS_SELECTOR, "input[type='checkbox'][name*='remember']"),
+                        (By.CSS_SELECTOR, "input[type='checkbox'][id*='remember']"),
+                    ]
+                    for by, sel in remember_input_selectors:
+                        try:
+                            el = self.driver.find_element(by, sel)
+                            if el.get_attribute('type') == 'checkbox' and not el.is_selected():
+                                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+                                el.click()
+                            remember_clicked = True
+                            break
+                        except Exception:
+                            continue
+                    if not remember_clicked:
+                        # Fall back to clicking the label if inputs weren't found
+                        try:
+                            lbl = self.driver.find_element(By.CSS_SELECTOR, "label[for*='remember']")
+                            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", lbl)
+                            lbl.click()
+                        except Exception:
+                            pass
 
-                sign_in_button_xpath = (
-                    "//button[contains(@class,'btn__primary--large') and contains(@type,'submit')]"
-                )
-                WebDriverWait(self.driver, 15).until(
-                    EC.element_to_be_clickable((By.XPATH, sign_in_button_xpath))
-                ).click()
+                    sign_in_button_xpath = (
+                        "//button[contains(@class,'btn__primary--large') and contains(@type,'submit')]"
+                    )
+                    WebDriverWait(self.driver, 15).until(
+                        EC.element_to_be_clickable((By.XPATH, sign_in_button_xpath))
+                    ).click()
             except Exception:
                 # No login form; continue
                 pass
 
-            # Wait for either feed or jobs page
-            WebDriverWait(self.driver, 20).until(
-                EC.any_of(
-                    EC.url_contains('linkedin.com/feed'),
-                    EC.url_contains('linkedin.com/jobs')
-                )
+            # Signed in once LinkedIn shows the feed or jobs page
+            signed_in = EC.any_of(
+                EC.url_contains('linkedin.com/feed'),
+                EC.url_contains('linkedin.com/jobs')
             )
+            if password:
+                try:
+                    WebDriverWait(self.driver, 20).until(signed_in)
+                    return
+                except TimeoutException:
+                    pass  # e.g. a security check; let the user finish by hand
+
+            print("\n[ACTION] Sign in to LinkedIn in the Chrome window (and finish any security check). "
+                  "The bot continues once you're signed in (waiting up to 5 minutes).")
+            print("[ACTION] Chrome remembers the login for this profile's next runs.\n")
+            WebDriverWait(self.driver, 300).until(signed_in)
         except Exception as e:
             print(f"Login flow warning: {e}")
 
     def generate_urls(self) -> None:
-        os.makedirs('data', exist_ok=True)
+        os.makedirs(utils.data_path(), exist_ok=True)
         try:
-            with open('data/urlData.txt', 'w', encoding='utf-8') as file:
+            with open(utils.data_path('urlData.txt'), 'w', encoding='utf-8') as file:
                 linkedin_job_links = utils.LinkedinUrlGenerate().generate_url_links()
                 for url in linkedin_job_links:
                     file.write(url + "\n")
             print('URLs created successfully. The bot will visit those URLs.')
         except Exception as e:
-            print("Couldn't generate URLs. Ensure ./data exists and config.py preferences are set.")
+            print("Couldn't generate URLs. Check your job search settings with: python3 main.py setup")
             print(str(e))
 
     def _progress_path(self) -> str:
-        return os.path.join('data', 'progress.json')
+        return utils.data_path('progress.json')
 
     def _load_progress(self) -> dict:
         try:
@@ -296,7 +321,7 @@ class LinkedIn:
 
     def _save_progress(self, base_url_index: int, page: int) -> None:
         try:
-            os.makedirs('data', exist_ok=True)
+            os.makedirs(utils.data_path(), exist_ok=True)
             data = {
                 'base_url_index': int(base_url_index),
                 'page': int(page),
@@ -320,7 +345,7 @@ class LinkedIn:
         count_jobs = 0
         count_skipped = 0
         count_saved = 0
-        self.pause_file = 'data/pause_bot.txt'
+        self.pause_file = utils.data_path('pause_bot.txt')
 
         url_data = utils.get_url_data_file()
         if not url_data:
@@ -344,7 +369,7 @@ class LinkedIn:
         applied_jobs = utils.get_applied_jobs()
         print(f"[INFO] Found {len(applied_jobs)} previously applied/attempted jobs.\n")
 
-        print("[INFO] Bot started. To pause, create file: data/pause_bot.txt")
+        print(f"[INFO] Bot started. To pause, create file: {self.pause_file}")
         print("[INFO] To resume, delete the pause file.\n")
 
         for idx, base_url in enumerate(url_data):
@@ -352,7 +377,7 @@ class LinkedIn:
                 continue
             # Check for pause
             if os.path.exists(self.pause_file):
-                print("\n[PAUSED] Bot paused. Delete data/pause_bot.txt to resume.")
+                print(f"\n[PAUSED] Bot paused. Delete {self.pause_file} to resume.")
                 while os.path.exists(self.pause_file):
                     time.sleep(5)
                 print("[RESUMED] Bot resuming...\n")
@@ -1201,7 +1226,14 @@ class LinkedIn:
         try:
             # Initialize dynamic form handler lazily
             if self.dynamic_form_handler is None:
-                self.dynamic_form_handler = DynamicFormHandler(self.driver)
+                if self.profile:
+                    self.dynamic_form_handler = DynamicFormHandler(
+                        self.driver,
+                        config_path=str(self.profile.questions_path),
+                        credentials_path=str(self.profile.settings_path),
+                    )
+                else:
+                    self.dynamic_form_handler = DynamicFormHandler(self.driver)
             
             # Process dynamic form elements
             results = self.dynamic_form_handler.process_dynamic_form(modal)
