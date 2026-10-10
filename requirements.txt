@@ -1,8 +1,5 @@
 selenium>=4.10.0
 python-dotenv>=1.0.0
-
-selenium
 webdriver_manager
 beautifulsoup4
 lxml
-python-dotenv
